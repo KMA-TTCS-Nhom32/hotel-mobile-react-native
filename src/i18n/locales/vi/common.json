@@ -12,5 +12,9 @@
     "bookings": "Đặt Phòng Của Tôi",
     "offers": "Ưu Đãi Độc Quyền",
     "account": "Tài Khoản Của Tôi"
+  },
+  "languages": {
+    "en": "Tiếng Anh",
+    "vi": "Tiếng Việt"
   }
 }

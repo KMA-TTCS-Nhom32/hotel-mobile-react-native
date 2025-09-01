@@ -12,5 +12,9 @@
     "bookings": "My Bookings",
     "offers": "Exclusive Offers",
     "account": "My Account"
+  },
+  "languages": {
+    "en": "English",
+    "vi": "Vietnamese"
   }
 }

@@ -163,7 +163,7 @@ export default function TabLayout() {
               focused={focused}
             />
           ),
-          headerTitle: t('headers.account'),
+          headerShown: false,
         }}
       />
     </Tabs>
