@@ -4,6 +4,7 @@ import React from 'react';
 import { Platform } from 'react-native';
 
 import { TAB_THEME } from '@/config/theme';
+import { useCommonTranslation, useLanguage } from '@/i18n/hooks';
 
 // Modern tab icon component with vector icons
 const TabIcon = ({
@@ -18,7 +19,7 @@ const TabIcon = ({
   size?: number;
 }) => {
   const getIconName = (iconName: string, isFocused: boolean) => {
-    const iconMap: Record<string, { focused: any; unfocused: any }> = {
+    const iconMap: Record<string, { focused: string; unfocused: string }> = {
       home: {
         focused: 'home',
         unfocused: 'home-outline',
@@ -46,7 +47,7 @@ const TabIcon = ({
 
   return (
     <Ionicons
-      name={getIconName(name, focused) as any}
+      name={getIconName(name, focused) as keyof typeof Ionicons.glyphMap}
       size={size}
       color={color}
     />
@@ -54,6 +55,11 @@ const TabIcon = ({
 };
 
 export default function TabLayout() {
+  const { t } = useCommonTranslation();
+  const { currentLanguage } = useLanguage();
+
+  const isEnglish = currentLanguage === 'en';
+
   return (
     <Tabs
       screenOptions={{
@@ -63,8 +69,8 @@ export default function TabLayout() {
           backgroundColor: TAB_THEME.backgroundColor,
           borderTopWidth: 1,
           borderTopColor: TAB_THEME.borderColor,
-          height: Platform.OS === 'ios' ? 85 : 65,
-          paddingBottom: Platform.OS === 'ios' ? 25 : 10,
+          height: Platform.OS === 'ios' ? 100 : 65,
+          paddingBottom: Platform.OS === 'ios' ? 30 : 10,
           paddingTop: 10,
           shadowColor: '#000',
           shadowOffset: { width: 0, height: -2 },
@@ -73,7 +79,7 @@ export default function TabLayout() {
           elevation: 10,
         },
         tabBarLabelStyle: {
-          fontSize: 12,
+          fontSize: isEnglish ? 12 : 11,
           fontWeight: '500',
           marginTop: 4,
         },
@@ -93,17 +99,17 @@ export default function TabLayout() {
       <Tabs.Screen
         name='index'
         options={{
-          title: 'Home',
+          title: t('navigation.home'),
           tabBarIcon: ({ color, size, focused }) => (
             <TabIcon name='home' color={color} size={size} focused={focused} />
           ),
-          headerTitle: 'AHomeVilla',
+          headerTitle: t('headers.home'),
         }}
       />
       <Tabs.Screen
         name='promotions'
         options={{
-          title: 'Promotions',
+          title: t('navigation.promotions'),
           tabBarIcon: ({ color, size, focused }) => (
             <TabIcon
               name='promotions'
@@ -112,13 +118,13 @@ export default function TabLayout() {
               focused={focused}
             />
           ),
-          headerTitle: 'Special Promotions',
+          headerTitle: t('headers.promotions'),
         }}
       />
       <Tabs.Screen
         name='bookings'
         options={{
-          title: 'Bookings',
+          title: t('navigation.bookings'),
           tabBarIcon: ({ color, size, focused }) => (
             <TabIcon
               name='bookings'
@@ -127,13 +133,13 @@ export default function TabLayout() {
               focused={focused}
             />
           ),
-          headerTitle: 'My Bookings',
+          headerTitle: t('headers.bookings'),
         }}
       />
       <Tabs.Screen
         name='offers'
         options={{
-          title: 'Offers',
+          title: t('navigation.offers'),
           tabBarIcon: ({ color, size, focused }) => (
             <TabIcon
               name='offers'
@@ -142,13 +148,13 @@ export default function TabLayout() {
               focused={focused}
             />
           ),
-          headerTitle: 'Exclusive Offers',
+          headerTitle: t('headers.offers'),
         }}
       />
       <Tabs.Screen
         name='account'
         options={{
-          title: 'Account',
+          title: t('navigation.account'),
           tabBarIcon: ({ color, size, focused }) => (
             <TabIcon
               name='account'
@@ -157,7 +163,7 @@ export default function TabLayout() {
               focused={focused}
             />
           ),
-          headerTitle: 'My Account',
+          headerTitle: t('headers.account'),
         }}
       />
     </Tabs>

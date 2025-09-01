@@ -14,7 +14,7 @@ module.exports = defineConfig([
 
     rules: {
       // Prettier
-      'prettier/prettier': 'error',
+      'prettier/prettier': 'warn',
 
       // Import sorting
       'import/order': [

@@ -2,7 +2,7 @@ import React from 'react';
 import { ScrollView, Text, View } from 'react-native';
 
 import { Screen } from '@/components/layout';
-import { Button, Card } from '@/components/ui';
+import { Button, Card, LanguageSwitcher } from '@/components/ui';
 
 export default function AccountScreen() {
   return (
@@ -64,6 +64,9 @@ export default function AccountScreen() {
         {/* Account Options */}
         <View className='mb-6 px-4'>
           <Card title='⚙️ Account Settings' variant='outlined'>
+            {/* Language Switcher */}
+            <LanguageSwitcher />
+
             <View className='gap-3'>
               <Button
                 title='🔒 Privacy & Security'

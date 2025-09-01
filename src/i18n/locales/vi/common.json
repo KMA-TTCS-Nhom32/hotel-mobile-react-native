@@ -1,0 +1,16 @@
+{
+  "navigation": {
+    "home": "Trang chủ",
+    "promotions": "Đề xuất",
+    "bookings": "Phòng đã đặt",
+    "offers": "Ưu đãi",
+    "account": "Tài khoản"
+  },
+  "headers": {
+    "home": "AHomeVilla",
+    "promotions": "Chương Trình Khuyến Mãi Đặc Biệt",
+    "bookings": "Đặt Phòng Của Tôi",
+    "offers": "Ưu Đãi Độc Quyền",
+    "account": "Tài Khoản Của Tôi"
+  }
+}

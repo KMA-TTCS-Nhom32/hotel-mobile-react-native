@@ -1,0 +1,16 @@
+{
+  "navigation": {
+    "home": "Home",
+    "promotions": "Promotions",
+    "bookings": "Bookings",
+    "offers": "Offers",
+    "account": "Account"
+  },
+  "headers": {
+    "home": "AHomeVilla",
+    "promotions": "Special Promotions",
+    "bookings": "My Bookings",
+    "offers": "Exclusive Offers",
+    "account": "My Account"
+  }
+}
