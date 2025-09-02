@@ -7,34 +7,7 @@ export const ENV = {
   COMPANY_NAME: 'AHomeVilla Hotels',
 };
 
-export const ENDPOINTS = {
-  AUTH: {
-    LOGIN: '/auth/login',
-    REGISTER: '/auth/register',
-    REFRESH: '/auth/refresh',
-    LOGOUT: '/auth/logout',
-    FORGOT_PASSWORD: '/auth/forgot-password',
-    RESET_PASSWORD: '/auth/reset-password',
-  },
-  HOTELS: {
-    LIST: '/hotels',
-    DETAILS: '/hotels/:id',
-    SEARCH: '/hotels/search',
-    NEARBY: '/hotels/nearby',
-  },
-  USER: {
-    PROFILE: '/user/profile',
-    UPDATE: '/user/profile',
-    BOOKINGS: '/user/bookings',
-    FAVORITES: '/user/favorites',
-  },
-} as const;
+export const LOCAL_STORAGE_KEY =
+  process.env.LOCAL_STORAGE_KEY || '@AHOMEPLACE_HOTEL_CMS';
 
-export const STORAGE_KEYS = {
-  ACCESS_TOKEN: '@ahomevilla_access_token',
-  REFRESH_TOKEN: '@ahomevilla_refresh_token',
-  USER_DATA: '@ahomevilla_user_data',
-  ONBOARDING_COMPLETED: '@ahomevilla_onboarding_completed',
-  SEARCH_HISTORY: '@ahomevilla_search_history',
-  FAVORITES: '@ahomevilla_favorites',
-} as const;
+export const IS_PRODUCTION = process.env.NODE_ENV === 'production';
