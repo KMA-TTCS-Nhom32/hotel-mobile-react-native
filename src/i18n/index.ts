@@ -3,7 +3,9 @@ import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 
 // Import translation files
+import enAuth from './locales/en/auth.json';
 import enCommon from './locales/en/common.json';
+import viAuth from './locales/vi/auth.json';
 import viCommon from './locales/vi/common.json';
 
 // Get device locale
@@ -13,9 +15,11 @@ const deviceLanguage = getLocales()[0]?.languageCode || 'en';
 const resources = {
   en: {
     common: enCommon,
+    auth: enAuth,
   },
   vi: {
     common: viCommon,
+    auth: viAuth,
   },
 };
 
@@ -26,14 +30,13 @@ export const availableLanguages = [
 ];
 
 // Initialize i18next
-const i18nInstance = i18n.use(initReactI18next);
-i18nInstance.init({
+i18n.use(initReactI18next).init({
   compatibilityJSON: 'v4',
   resources,
   lng: deviceLanguage,
   fallbackLng: 'en',
   defaultNS: 'common',
-  ns: ['common'],
+  ns: ['common', 'auth'],
 
   interpolation: {
     escapeValue: false,
@@ -43,7 +46,7 @@ i18nInstance.init({
     useSuspense: false,
   },
 
-  debug: __DEV__,
+  debug: false, // Disable debug to prevent infinite loading issues
 });
 
 export default i18n;

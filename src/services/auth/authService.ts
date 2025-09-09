@@ -2,6 +2,7 @@ import type {
   LoginDto,
   LoginResponseDto,
   RefreshTokenResponseDto,
+  User,
 } from '@ahomevilla-hotel/node-sdk';
 
 import {
@@ -79,6 +80,19 @@ export class AuthService implements IAuthService {
     } finally {
       // Always clear local session
       await this.clearSession();
+    }
+  }
+
+  /**
+   * Get user profile information
+   */
+  async getProfile(): Promise<User> {
+    try {
+      const response = await privateRequest.get<User>(ENDPOINTS.PROFILE);
+      return response.data;
+    } catch (error) {
+      console.error('Failed to fetch user profile:', error);
+      throw this.handleError(error, 'Failed to fetch user profile');
     }
   }
 

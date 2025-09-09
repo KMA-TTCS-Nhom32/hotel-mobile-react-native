@@ -1,9 +1,11 @@
 import { Ionicons } from '@expo/vector-icons';
-import { Tabs } from 'expo-router';
+import { Tabs, useRouter } from 'expo-router';
 import React from 'react';
 import { Platform } from 'react-native';
 
+import { ROUTES } from '@/config/routes';
 import { TAB_THEME } from '@/config/theme';
+import { useAuth } from '@/hooks/useAuth';
 import { useCommonTranslation, useLanguage } from '@/i18n/hooks';
 
 // Modern tab icon component with vector icons
@@ -57,8 +59,14 @@ const TabIcon = ({
 export default function TabLayout() {
   const { t } = useCommonTranslation();
   const { currentLanguage } = useLanguage();
+  const { isAuthenticated } = useAuth();
+  const { replace } = useRouter();
 
   const isEnglish = currentLanguage === 'en';
+
+  if (!isAuthenticated) {
+    replace(ROUTES.AUTH.LOGIN);
+  }
 
   return (
     <Tabs

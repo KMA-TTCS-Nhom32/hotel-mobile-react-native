@@ -16,5 +16,34 @@
   "languages": {
     "en": "English",
     "vi": "Vietnamese"
+  },
+  "account": {
+    "profile": "Profile",
+    "settings": "Settings",
+    "personalInfo": "Personal Information",
+    "preferences": "Preferences",
+    "security": "Security",
+    "language": "Language",
+    "notifications": "Notifications",
+    "help": "Q&A / Help",
+    "about": "About Us",
+    "terms": "Terms of Service",
+    "privacy": "Privacy Policy",
+    "version": "App Version",
+    "region": "Region",
+    "information": "Information",
+    "noEmailAvailable": "No email available"
+  },
+  "buttons": {
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "save": "Save",
+    "edit": "Edit",
+    "delete": "Delete",
+    "retry": "Retry",
+    "continue": "Continue",
+    "skip": "Skip",
+    "done": "Done",
+    "close": "Close"
   }
 }

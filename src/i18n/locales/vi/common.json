@@ -16,5 +16,34 @@
   "languages": {
     "en": "Tiếng Anh",
     "vi": "Tiếng Việt"
+  },
+  "account": {
+    "profile": "Hồ sơ",
+    "settings": "Cài đặt",
+    "personalInfo": "Thông tin cá nhân",
+    "preferences": "Tùy chọn",
+    "security": "Bảo mật",
+    "language": "Ngôn ngữ",
+    "notifications": "Thông báo",
+    "help": "Trợ giúp",
+    "about": "Về chúng tôi",
+    "terms": "Điều khoản sử dụng",
+    "privacy": "Chính sách bảo mật",
+    "version": "Phiên bản",
+    "region": "Khu vực",
+    "information": "Thông tin",
+    "noEmailAvailable": "Không có email"
+  },
+  "buttons": {
+    "cancel": "Hủy",
+    "confirm": "Xác nhận",
+    "save": "Lưu",
+    "edit": "Chỉnh sửa",
+    "delete": "Xóa",
+    "retry": "Thử lại",
+    "continue": "Tiếp tục",
+    "skip": "Bỏ qua",
+    "done": "Hoàn thành",
+    "close": "Đóng"
   }
 }
