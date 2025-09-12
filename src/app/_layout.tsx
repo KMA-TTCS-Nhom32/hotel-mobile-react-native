@@ -19,6 +19,15 @@ const queryClient = new QueryClient({
   },
 });
 
+/**
+ * Root layout component that provides app-wide context and routing shell.
+ *
+ * Renders the React Query provider with the preconfigured query client, wraps
+ * content with an authentication gate (ProtectedRoute), and defines the
+ * top-level navigation Stack containing the '(tabs)' screen (header hidden).
+ *
+ * @returns The root JSX element for the app's layout.
+ */
 export default function RootLayout() {
   return (
     <QueryClientProvider client={queryClient}>
