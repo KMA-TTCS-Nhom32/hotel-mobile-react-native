@@ -56,6 +56,17 @@ const TabIcon = ({
   );
 };
 
+/**
+ * Bottom tab navigator for the app with themed styling and an authentication gate.
+ *
+ * Renders the main Tabs navigator with five screens (home, promotions, bookings, offers, account),
+ * applying TAB_THEME-driven colors and platform-specific layout adjustments. If the user is not
+ * authenticated, immediately redirects to the login route (ROUTES.AUTH.LOGIN) via the router's
+ * `replace` before rendering the tabs. Label font size is slightly smaller when the current
+ * language is not English.
+ *
+ * @returns The Tabs navigator React element configured with per-screen titles, icons, and headers.
+ */
 export default function TabLayout() {
   const { t } = useCommonTranslation();
   const { currentLanguage } = useLanguage();

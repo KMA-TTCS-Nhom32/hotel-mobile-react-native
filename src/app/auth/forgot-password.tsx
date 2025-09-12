@@ -1,6 +1,14 @@
 import React from 'react';
 import { Text, View } from 'react-native';
 
+/**
+ * Renders the "Forgot Password" placeholder page used in the authentication flow.
+ *
+ * Displays a full-screen, centered view with a header ("Forgot Password Page")
+ * and a secondary "Coming soon..." line, styled with an orange theme.
+ *
+ * @returns A React element representing the forgot-password page.
+ */
 export default function ForgotPasswordPage() {
   return (
     <View className='flex-1 items-center justify-center bg-orange-50'>

@@ -22,6 +22,16 @@ import {
 } from '@/i18n/hooks';
 import { useProfile } from '@/store/authStore';
 
+/**
+ * Account/settings screen component that displays the current user's profile and app settings.
+ *
+ * Renders a user header (avatar, name, email, phone), settings (language, region), informational
+ * items (help, terms & privacy, app version), and a logout action. Tapping the language row
+ * opens the language selection modal; tapping logout shows a confirmation alert and invokes the
+ * auth logout flow. Uses translations and user/profile/auth hooks for content and state.
+ *
+ * @returns The Account screen React element.
+ */
 export default function AccountScreen() {
   const { t } = useCommonTranslation();
   const { t: authT } = useAuthTranslation();
