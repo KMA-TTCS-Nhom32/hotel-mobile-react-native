@@ -17,7 +17,7 @@ interface ProtectedRouteProps {
  * Uses React Query for auth state and Zustand for user data
  */
 export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
-  const { isAuthenticated, isLoading, isInitialized } = useAuth();
+  const { isAuthenticated, isLoading, isInitialized, logout } = useAuth();
 
   const { user, setUser, loadProfile } = useAuthStore();
 
@@ -32,6 +32,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
         })
         .catch(error => {
           console.error('Failed to load profile:', error);
+          logout(); // Logout on profile load failure
         });
     }
   }, [isAuthenticated, user, loadProfile, setUser]);

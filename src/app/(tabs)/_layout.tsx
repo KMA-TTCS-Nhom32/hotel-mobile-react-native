@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { Tabs, useRouter } from 'expo-router';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Platform } from 'react-native';
 
 import { ROUTES } from '@/config/routes';
@@ -59,14 +59,16 @@ const TabIcon = ({
 export default function TabLayout() {
   const { t } = useCommonTranslation();
   const { currentLanguage } = useLanguage();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, isLoading, isInitialized } = useAuth();
   const { replace } = useRouter();
 
   const isEnglish = currentLanguage === 'en';
 
-  if (!isAuthenticated) {
-    replace(ROUTES.AUTH.LOGIN);
-  }
+  useEffect(() => {
+    if (isInitialized && !isAuthenticated && !isLoading) {
+      replace(ROUTES.AUTH.LOGIN);
+    }
+  }, [isAuthenticated, isInitialized, isLoading, replace]);
 
   return (
     <Tabs

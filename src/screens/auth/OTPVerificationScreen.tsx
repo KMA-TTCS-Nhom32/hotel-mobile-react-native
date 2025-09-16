@@ -22,15 +22,27 @@ export const OTPVerificationScreen = () => {
   const [isResending, setIsResending] = useState(false);
   const inputRefs = useRef<(TextInput | null)[]>([]);
 
-  const handleOtpChange = (value: string, index: number) => {
-    const newOtp = [...otp];
-    newOtp[index] = value;
-    setOtp(newOtp);
-
-    // Auto-focus next input
-    if (value && index < 5) {
-      inputRefs.current[index + 1]?.focus();
+  const handleOtpChange = (raw: string, index: number) => {
+    const digits = raw.replace(/\D/g, '');
+    if (digits.length === 0) {
+      setOtp(prev => {
+        const next = [...prev];
+        next[index] = '';
+        return next;
+      });
+      return;
     }
+    setOtp(prev => {
+      const next = [...prev];
+      const chars = digits.split('');
+      next[index] = chars[0]!;
+      for (let i = 1; i < chars.length && index + i < 6; i++) {
+        next[index + i] = chars[i]!;
+      }
+      return next;
+    });
+    const nextIndex = Math.min(index + digits.length, 5);
+    inputRefs.current[nextIndex]?.focus();
   };
 
   const handleKeyPress = (key: string, index: number) => {

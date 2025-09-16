@@ -1,9 +1,9 @@
 import type { User } from '@ahomevilla-hotel/node-sdk';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 
 import { authService } from '@/services/auth/authService';
-import { Storage } from '@/utils/storage';
 
 interface AuthState {
   // User data (persisted)
@@ -50,18 +50,19 @@ export const useAuthStore = create<AuthState>()(
     }),
     {
       name: 'auth-storage',
-      storage: createJSONStorage(() => ({
-        getItem: async (name: string) => {
-          const value = await Storage.getItem<string>(name);
-          return value;
-        },
-        setItem: async (name: string, value: string) => {
-          await Storage.setItem(name, value);
-        },
-        removeItem: async (name: string) => {
-          await Storage.removeItem(name);
-        },
-      })),
+      // storage: createJSONStorage(() => ({
+      //   getItem: async (name: string) => {
+      //     const value = await Storage.getItem<string>(name);
+      //     return value;
+      //   },
+      //   setItem: async (name: string, value: string) => {
+      //     await Storage.setItem(name, value);
+      //   },
+      //   removeItem: async (name: string) => {
+      //     await Storage.removeItem(name);
+      //   },
+      // })),
+      storage: createJSONStorage(() => AsyncStorage),
       // Only persist user data
       partialize: state => ({
         user: state.user,

@@ -30,6 +30,8 @@
     "components",
     "utils",
     "config",
-    "auth"
+    "auth",
+    "i18n",
+    "routing"
   ]
 }
