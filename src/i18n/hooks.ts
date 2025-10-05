@@ -10,6 +10,13 @@ export const useCommonTranslation = () => {
 };
 
 /**
+ * Custom hook for using translations with auth namespace
+ */
+export const useAuthTranslation = () => {
+  return useTranslation('auth');
+};
+
+/**
  * Custom hook for language management
  */
 export const useLanguage = () => {

@@ -24,5 +24,14 @@
       "source.fixAll.eslint": "explicit"
     }
   },
-  "conventionalCommits.scopes": ["app", "ui", "components", "utils", "config"]
+  "conventionalCommits.scopes": [
+    "app",
+    "ui",
+    "components",
+    "utils",
+    "config",
+    "auth",
+    "i18n",
+    "routing"
+  ]
 }

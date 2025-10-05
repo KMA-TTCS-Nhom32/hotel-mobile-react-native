@@ -1,6 +1,6 @@
 import type { LoginDto } from '@ahomevilla-hotel/node-sdk';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 import { authService } from '@/services/auth/authService';
 
@@ -23,13 +23,22 @@ export const useAuth = () => {
     data: isAuthenticated = false,
     isLoading: isCheckingAuth,
     error: authError,
+    isSuccess,
   } = useQuery({
     queryKey: AUTH_QUERY_KEYS.isAuthenticated,
     queryFn: authService.isAuthenticated,
     staleTime: 5 * 60 * 1000, // 5 minutes
     retry: false,
     refetchOnWindowFocus: false,
+    refetchOnMount: false,
   });
+
+  // Set initialized when the first auth check completes
+  useEffect(() => {
+    if (isSuccess && !isInitialized) {
+      setIsInitialized(true);
+    }
+  }, [isSuccess, isInitialized]);
 
   // Login mutation
   const loginMutation = useMutation({
@@ -50,7 +59,7 @@ export const useAuth = () => {
 
   // Logout mutation
   const logoutMutation = useMutation({
-    mutationFn: authService.logout,
+    mutationFn: () => authService.logout(),
     onSuccess: () => {
       // Clear all auth-related data
       queryClient.setQueryData(AUTH_QUERY_KEYS.isAuthenticated, false);

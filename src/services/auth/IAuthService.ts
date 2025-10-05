@@ -2,6 +2,7 @@ import type {
   LoginDto,
   LoginResponseDto,
   RefreshTokenResponseDto,
+  User,
 } from '@ahomevilla-hotel/node-sdk';
 
 /**
@@ -38,4 +39,6 @@ export interface IAuthService {
    * Helper method for cleanup
    */
   clearSession(): Promise<void>;
+
+  getProfile(): Promise<User>;
 }

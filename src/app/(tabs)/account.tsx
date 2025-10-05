@@ -1,21 +1,59 @@
-import { Ionicons } from '@expo/vector-icons';
+import Ionicons from '@expo/vector-icons/Ionicons';
 import React, { useState } from 'react';
-import { Image, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import {
+  Alert,
+  Image,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 
 import { Screen } from '@/components/layout';
 import {
   LANGUAGE_OPTIONS,
   LanguageSelectionModal,
 } from '@/components/ui/LanguageSelectionModal';
-import { useCommonTranslation, useLanguage } from '@/i18n/hooks';
+import { useAuth } from '@/hooks/useAuth';
+import {
+  useCommonTranslation,
+  useLanguage,
+  useAuthTranslation,
+} from '@/i18n/hooks';
+import { useProfile } from '@/store/authStore';
 
 export default function AccountScreen() {
   const { t } = useCommonTranslation();
+  const { t: authT } = useAuthTranslation();
   const { currentLanguage } = useLanguage();
   const [showLanguageModal, setShowLanguageModal] = useState(false);
 
+  // Auth and profile data
+  const { logout, isLoggingOut } = useAuth();
+  const { user } = useProfile();
+
   const getCurrentLanguageOption = () => {
     return LANGUAGE_OPTIONS.find(option => option.value === currentLanguage);
+  };
+
+  const handleLogout = () => {
+    Alert.alert(authT('confirmLogout'), authT('logoutMessage'), [
+      {
+        text: t('buttons.cancel'),
+        style: 'cancel',
+      },
+      {
+        text: authT('logout'),
+        style: 'destructive',
+        onPress: async () => {
+          try {
+            await logout();
+          } catch (error) {
+            console.error('Logout error:', error);
+          }
+        },
+      },
+    ]);
   };
 
   return (
@@ -25,18 +63,23 @@ export default function AccountScreen() {
         <View className='bg-white pb-6 pt-4'>
           <View className='mx-4 flex-row items-center'>
             {/* Avatar */}
-            <View className='mr-4 h-16 w-16 items-center justify-center rounded-full bg-primary-main'>
-              <Text className='text-2xl text-white'>👤</Text>
+            <View className='mr-4 h-16 w-16 items-center justify-center rounded-full bg-orange-500'>
+              <Text className='text-2xl text-white'>
+                {user?.name?.charAt(0) || user?.email?.charAt(0) || '👤'}
+              </Text>
             </View>
 
             {/* User Info */}
             <View className='flex-1'>
               <Text className='text-lg font-semibold text-neutral-darkest'>
-                John Doe
+                {user?.name || user?.email || 'User'}
               </Text>
               <Text className='text-sm text-neutral-dark'>
-                john.doe@example.com
+                {user?.email || 'No email available'}
               </Text>
+              {user?.phone && (
+                <Text className='text-sm text-neutral-dark'>{user.phone}</Text>
+              )}
             </View>
 
             {/* Edit Button */}
@@ -54,7 +97,7 @@ export default function AccountScreen() {
           {/* Settings Section */}
           <View className='mx-4 mb-4 mt-6'>
             <Text className='mb-3 text-lg font-semibold text-neutral-darkest'>
-              Settings
+              {t('account.settings')}
             </Text>
             <View className='rounded-xl bg-white shadow-sm'>
               {/* Language Option */}
@@ -62,7 +105,9 @@ export default function AccountScreen() {
                 className='flex-row items-center justify-between border-b border-neutral-lighter p-4'
                 onPress={() => setShowLanguageModal(true)}
               >
-                <Text className='text-base text-neutral-darkest'>Language</Text>
+                <Text className='text-base text-neutral-darkest'>
+                  {t('account.language')}
+                </Text>
                 <View className='flex-row items-center'>
                   <Text className='mr-2 text-sm text-neutral-dark'>
                     {t(getCurrentLanguageOption()?.label || 'languages.en')}
@@ -109,7 +154,7 @@ export default function AccountScreen() {
                     className='mr-3'
                   />
                   <Text className='text-base text-neutral-darkest'>
-                    Q&A / Help
+                    {t('account.help')}
                   </Text>
                 </View>
                 <Ionicons name='chevron-forward' size={16} color='#94a3b8' />
@@ -128,7 +173,7 @@ export default function AccountScreen() {
                     className='mr-3'
                   />
                   <Text className='text-base text-neutral-darkest'>
-                    Terms & Privacy
+                    {t('account.terms')} & {t('account.privacy')}
                   </Text>
                 </View>
                 <Ionicons name='chevron-forward' size={16} color='#94a3b8' />
@@ -144,7 +189,7 @@ export default function AccountScreen() {
                     className='mr-3'
                   />
                   <Text className='text-base text-neutral-darkest'>
-                    App Version
+                    {t('account.version')}
                   </Text>
                 </View>
                 <Text className='text-sm text-neutral-dark'>1.0.0</Text>
@@ -153,7 +198,8 @@ export default function AccountScreen() {
               {/* Logout */}
               <TouchableOpacity
                 className='p-4'
-                onPress={() => console.log('Logout pressed')}
+                onPress={handleLogout}
+                disabled={isLoggingOut}
               >
                 <View className='flex-row items-center'>
                   <Ionicons
@@ -162,7 +208,9 @@ export default function AccountScreen() {
                     color='#dc2626'
                     className='mr-3'
                   />
-                  <Text className='text-base text-red-600'>Logout</Text>
+                  <Text className='text-base text-red-600'>
+                    {isLoggingOut ? authT('loggingOut') : authT('logout')}
+                  </Text>
                 </View>
               </TouchableOpacity>
             </View>
