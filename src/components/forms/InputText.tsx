@@ -120,7 +120,12 @@ export const InputText = <
                 ]}
                 value={currentValue}
                 onChangeText={onChange}
-                onBlur={onBlur}
+                // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                onBlur={e => {
+                  setIsFocused(false);
+                  onBlur();
+                  // textInputProps.onBlur?.(e);
+                }}
                 onFocus={e => {
                   setIsFocused(true);
                   textInputProps.onFocus?.(e);

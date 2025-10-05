@@ -141,7 +141,7 @@ export interface InputSelectProps<
   /**
    * Array of selectable options
    */
-  options: SelectOption[];
+  options: SelectOption<TFieldValues[TName]>[];
 
   /**
    * Placeholder text when no option is selected

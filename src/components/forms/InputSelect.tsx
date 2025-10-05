@@ -96,7 +96,7 @@ export const InputSelect = <
 
   // Handle option selection
   const handleOptionSelect = (
-    option: SelectOption,
+    option: SelectOption<TFieldValues[keyof TFieldValues]>,
     currentValue: unknown,
     onChange: (value: unknown) => void
   ) => {
@@ -116,6 +116,7 @@ export const InputSelect = <
       // Single selection
       onChange(option.value);
       setIsModalVisible(false);
+      setIsFocused(false);
       setSearchQuery('');
     }
   };
@@ -126,7 +127,10 @@ export const InputSelect = <
   };
 
   // Check if option is selected
-  const isOptionSelected = (option: SelectOption, value: unknown): boolean => {
+  const isOptionSelected = (
+    option: SelectOption<TFieldValues[keyof TFieldValues]>,
+    value: unknown
+  ): boolean => {
     if (multiple && Array.isArray(value)) {
       return value.includes(option.value);
     }
@@ -135,14 +139,14 @@ export const InputSelect = <
 
   // Render option item
   const renderOptionItem = (
-    item: SelectOption,
+    item: SelectOption<TFieldValues[keyof TFieldValues]>,
     isSelected: boolean,
     onPress: () => void
   ) => {
     if (renderOption) {
       return (
         <TouchableOpacity onPress={onPress} disabled={item.disabled}>
-          {renderOption(item, isSelected)}
+          {renderOption(item as SelectOption, isSelected)}
         </TouchableOpacity>
       );
     }
