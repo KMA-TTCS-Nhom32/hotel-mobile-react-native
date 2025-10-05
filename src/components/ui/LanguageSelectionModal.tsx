@@ -1,4 +1,5 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
+import { useQueryClient } from '@tanstack/react-query';
 import React from 'react';
 import { Image, Modal, Text, TouchableOpacity, View } from 'react-native';
 
@@ -32,9 +33,20 @@ export const LanguageSelectionModal: React.FC<LanguageSelectionModalProps> = ({
   title = 'Select Language',
 }) => {
   const { currentLanguage, changeLanguage } = useLanguage();
+  const queryClient = useQueryClient();
 
-  const handleLanguageSelect = (languageCode: string) => {
-    changeLanguage(languageCode);
+  const handleLanguageSelect = async (languageCode: string) => {
+    if (languageCode === currentLanguage) {
+      onClose();
+      return;
+    }
+
+    // Change language
+    await changeLanguage(languageCode);
+
+    // Invalidate all queries to refetch data with new language
+    queryClient.invalidateQueries();
+
     onClose();
   };
 

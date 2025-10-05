@@ -45,3 +45,4 @@ app-example
 .github/
 
 frontend-web-app.txt
+be-schema.prisma

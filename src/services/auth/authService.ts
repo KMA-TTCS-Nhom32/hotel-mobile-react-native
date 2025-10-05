@@ -6,11 +6,12 @@ import type {
 } from '@ahomevilla-hotel/node-sdk';
 
 import {
-  publicRequest,
-  privateRequest,
-  TokenManager,
   ENDPOINTS,
+  privateRequest,
+  publicRequest,
+  TokenManager,
 } from '@/config/api';
+import { handleServiceError } from '@/utils/errors';
 
 import type { IAuthService } from './IAuthService';
 
@@ -22,7 +23,7 @@ export class AuthService implements IAuthService {
   /**
    * Login with email and password
    */
-  async login(credentials: LoginDto): Promise<LoginResponseDto> {
+  login = async (credentials: LoginDto): Promise<LoginResponseDto> => {
     try {
       const response = await publicRequest.post<LoginResponseDto>(
         ENDPOINTS.LOGIN,
@@ -34,15 +35,14 @@ export class AuthService implements IAuthService {
 
       return response.data;
     } catch (error) {
-      console.error('Login failed:', error);
-      throw this.handleError(error, 'Login failed');
+      throw handleServiceError(error, 'Login failed');
     }
-  }
+  };
 
   /**
    * Refresh access token using refresh token
    */
-  async refreshToken(): Promise<RefreshTokenResponseDto> {
+  refreshToken = async (): Promise<RefreshTokenResponseDto> => {
     try {
       const refreshToken = await TokenManager.getRefreshToken();
 
@@ -60,17 +60,16 @@ export class AuthService implements IAuthService {
 
       return response.data;
     } catch (error) {
-      console.error('Token refresh failed:', error);
       await this.clearSession();
-      throw this.handleError(error, 'Token refresh failed');
+      throw handleServiceError(error, 'Token refresh failed');
     }
-  }
+  };
 
   /**
    * Logout user and clear session
    * No response body, success/failure based on status code
    */
-  async logout(): Promise<void> {
+  logout = async (): Promise<void> => {
     try {
       // Call logout endpoint (no response body expected)
       await privateRequest.post(ENDPOINTS.LOGOUT);
@@ -81,25 +80,24 @@ export class AuthService implements IAuthService {
       // Always clear local session
       await this.clearSession();
     }
-  }
+  };
 
   /**
    * Get user profile information
    */
-  async getProfile(): Promise<User> {
+  getProfile = async (): Promise<User> => {
     try {
       const response = await privateRequest.get<User>(ENDPOINTS.PROFILE);
       return response.data;
     } catch (error) {
-      console.error('Failed to fetch user profile:', error);
-      throw this.handleError(error, 'Failed to fetch user profile');
+      throw handleServiceError(error, 'Failed to fetch user profile');
     }
-  }
+  };
 
   /**
    * Check if user is currently authenticated
    */
-  async isAuthenticated(): Promise<boolean> {
+  isAuthenticated = async (): Promise<boolean> => {
     try {
       const accessToken = await TokenManager.getAccessToken();
       const isExpired = await TokenManager.isTokenExpired();
@@ -109,58 +107,18 @@ export class AuthService implements IAuthService {
       console.error('Failed to check authentication status:', error);
       return false;
     }
-  }
+  };
 
   /**
    * Clear local session data
    */
-  async clearSession(): Promise<void> {
+  clearSession = async (): Promise<void> => {
     try {
       await TokenManager.clearTokens();
     } catch (error) {
-      console.error('Failed to clear session:', error);
-      throw this.handleError(error, 'Failed to clear session');
+      throw handleServiceError(error, 'Failed to clear session');
     }
-  }
-
-  /**
-   * Handle and standardize errors
-   */
-  private handleError(error: unknown, defaultMessage: string): Error {
-    if (error instanceof Error) {
-      return error;
-    }
-
-    // Handle Axios errors
-    if (typeof error === 'object' && error !== null && 'response' in error) {
-      const axiosError = error as {
-        response?: {
-          status: number;
-          data?: { message?: string };
-        };
-      };
-
-      const status = axiosError.response?.status;
-      const message = axiosError.response?.data?.message;
-
-      switch (status) {
-        case 401:
-          return new Error(message || 'Invalid credentials');
-        case 403:
-          return new Error(message || 'Access denied');
-        case 429:
-          return new Error(
-            message || 'Too many requests. Please try again later'
-          );
-        case 500:
-          return new Error(message || 'Server error. Please try again later');
-        default:
-          return new Error(message || defaultMessage);
-      }
-    }
-
-    return new Error(defaultMessage);
-  }
+  };
 }
 
 // Export singleton instance

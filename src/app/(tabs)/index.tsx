@@ -1,88 +1,134 @@
-import React from 'react';
-import { ScrollView, Text, View } from 'react-native';
+import type { Branch } from '@ahomevilla-hotel/node-sdk';
+import Ionicons from '@expo/vector-icons/Ionicons';
+import { StatusBar } from 'expo-status-bar';
+import React, { useState } from 'react';
+import { ActivityIndicator, Animated, Text, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { Screen } from '@/components/layout';
-import { Button, Card } from '@/components/ui';
+import { BranchCarousel } from '@/components/home/BranchCarousel';
+import { ProvinceSection } from '@/components/home/ProvinceSection';
+import { SearchBar } from '@/components/home/SearchBar';
+import { useLatestBranches } from '@/hooks/useBranches';
+import { useCommonTranslation } from '@/i18n/hooks';
+
+const STICKY_THRESHOLD = 80;
 
 export default function HomeScreen() {
+  const { t } = useCommonTranslation();
+  const [isSticky, setIsSticky] = useState(false);
+  const scrollY = new Animated.Value(0);
+
+  // Fetch latest branches
+  const {
+    data: latestBranches,
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useLatestBranches();
+
+  const handleScroll = Animated.event(
+    [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+    {
+      useNativeDriver: false,
+      listener: (event: { nativeEvent: { contentOffset: { y: number } } }) => {
+        const offsetY = event.nativeEvent.contentOffset.y;
+        setIsSticky(offsetY > STICKY_THRESHOLD);
+      },
+    }
+  );
+
+  const handleBranchPress = (branch: Branch) => {
+    console.log('Branch pressed:', branch.name);
+    // TODO: Navigate to branch details
+  };
+
+  const handleSearchPress = () => {
+    console.log('Search pressed');
+    // TODO: Navigate to search screen
+  };
+
   return (
-    <Screen>
-      <ScrollView className='flex-1'>
-        {/* Welcome Section */}
-        <View className='px-4 py-6'>
-          <Text className='mb-2 text-2xl font-bold text-primary-main'>
-            Welcome to AHomeVilla
-          </Text>
-          <Text className='text-base text-neutral-dark'>
-            Find your perfect stay with exclusive hotel deals
-          </Text>
+    <SafeAreaView
+      className={`flex-1 ${isSticky ? 'bg-background-secondary' : 'bg-primary-main'}`}
+      edges={['top']}
+    >
+      {/* Status Bar - changes style based on scroll position */}
+      <StatusBar style={isSticky ? 'dark' : 'light'} />
+
+      {/* Sticky Search Bar */}
+      {isSticky && (
+        <View className='pt-safe absolute left-0 right-0 top-0 z-10 bg-background-secondary'>
+          <SearchBar onPress={handleSearchPress} isSticky />
+        </View>
+      )}
+
+      <Animated.ScrollView
+        onScroll={handleScroll}
+        scrollEventThrottle={16}
+        showsVerticalScrollIndicator={false}
+        // bounces={false}
+        // overScrollMode='never'
+        contentContainerStyle={{
+          paddingTop: isSticky ? 60 : 0,
+          flexGrow: 1,
+        }}
+      >
+        {/* Search Bar Section */}
+        <View className='bg-primary-main'>
+          <SearchBar onPress={handleSearchPress} />
         </View>
 
-        {/* Search Card */}
-        <View className='mb-6 px-4'>
-          <Card
-            title='🔍 Find Hotels'
-            subtitle='Search for the perfect accommodation'
-            variant='elevated'
-          >
-            <Button
-              title='Search Hotels'
-              onPress={() => console.log('Search hotels pressed')}
-              variant='primary'
-              fullWidth
-            />
-          </Card>
-        </View>
-
-        {/* Featured Offers */}
-        <View className='mb-6 px-4'>
-          <Card
-            title='✨ Featured Offers'
-            subtitle="Don't miss these amazing deals"
-            variant='outlined'
-          >
-            <View className='gap-3'>
-              <View className='rounded-lg border border-luxury-light bg-luxury-lightest p-4'>
-                <Text className='mb-1 font-semibold text-luxury-darkest'>
-                  Premium Suite Deal
-                </Text>
-                <Text className='text-sm text-luxury-dark'>
-                  Save up to 30% on luxury accommodations
+        {/* Body Content with Rounded Top */}
+        <View className='flex-1 rounded-t-3xl bg-background-secondary pt-4'>
+          {/* Latest Branches Section */}
+          <View className='mt-4'>
+            {isLoading ? (
+              <View className='items-center py-8'>
+                <ActivityIndicator size='large' color='#f97316' />
+                <Text className='mt-2 text-sm text-neutral-dark'>
+                  {t('home.loadingBranches')}
                 </Text>
               </View>
-
-              <View className='rounded-lg border border-success-light bg-success-lightest p-4'>
-                <Text className='mb-1 font-semibold text-success-darkest'>
-                  Early Bird Special
+            ) : isError ? (
+              <View className='items-center px-4 py-8'>
+                <Ionicons
+                  name='alert-circle-outline'
+                  size={48}
+                  color='#ef4444'
+                />
+                <Text className='mt-2 text-center text-sm text-neutral-dark'>
+                  {error?.message || t('home.failedToLoadBranches')}
                 </Text>
-                <Text className='text-sm text-success-dark'>
-                  Book 30 days in advance and save 20%
+                <Text
+                  className='mt-4 text-sm font-medium text-primary-main'
+                  onPress={() => refetch()}
+                >
+                  {t('home.tapToRetry')}
                 </Text>
               </View>
-            </View>
-          </Card>
-        </View>
+            ) : latestBranches && latestBranches.length > 0 ? (
+              <BranchCarousel
+                branches={latestBranches}
+                onBranchPress={handleBranchPress}
+              />
+            ) : (
+              <View className='items-center py-8'>
+                <Ionicons name='business-outline' size={48} color='#a3a3a3' />
+                <Text className='mt-2 text-sm text-neutral-dark'>
+                  {t('home.noBranchesAvailable')}
+                </Text>
+              </View>
+            )}
+          </View>
 
-        {/* Quick Actions */}
-        <View className='mb-6 px-4'>
-          <Card title='⚡ Quick Actions' variant='outlined'>
-            <View className='flex-row gap-3'>
-              <Button
-                title='My Trips'
-                variant='outline'
-                onPress={() => console.log('My trips pressed')}
-                style={{ flex: 1 }}
-              />
-              <Button
-                title='Support'
-                variant='secondary'
-                onPress={() => console.log('Support pressed')}
-                style={{ flex: 1 }}
-              />
-            </View>
-          </Card>
+          {/* Province Section */}
+          <ProvinceSection onBranchPress={handleBranchPress} />
+
+          {/* Bottom Padding */}
+          <View className='pb-8' />
         </View>
-      </ScrollView>
-    </Screen>
+      </Animated.ScrollView>
+    </SafeAreaView>
   );
 }
