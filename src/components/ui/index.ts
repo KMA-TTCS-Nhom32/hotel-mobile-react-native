@@ -1,8 +1,10 @@
 export { Button } from './Button';
 export { Card } from './Card';
+export { CompactLanguageSwitcher } from './CompactLanguageSwitcher';
 export { EmptyState } from './EmptyState';
 export { ErrorState } from './ErrorState';
 export { Input } from './Input';
 export { LanguageSelectionModal } from './LanguageSelectionModal';
+export { LanguageSelectMenu } from './LanguageSelectMenu';
 export { LanguageSwitcher } from './LanguageSwitcher';
 export { LoadingSpinner } from './LoadingSpinner';

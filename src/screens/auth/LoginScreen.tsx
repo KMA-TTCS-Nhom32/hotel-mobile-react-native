@@ -1,5 +1,6 @@
+import { zodResolver } from '@hookform/resolvers/zod';
 import { Link } from 'expo-router';
-import { useState } from 'react';
+import { FormProvider, useForm } from 'react-hook-form';
 import {
   View,
   Text,
@@ -11,35 +12,38 @@ import {
   TouchableOpacity,
 } from 'react-native';
 
-import { Button, Input } from '@/components/ui';
+import { InputText } from '@/components/forms';
+import { Button } from '@/components/ui';
 import { useAuth } from '@/hooks/useAuth';
 import { useAuthTranslation } from '@/i18n/hooks';
 import { authService } from '@/services/auth/authService';
 import { useAuthStore } from '@/store/authStore';
+import { createLoginSchema, LoginFormData } from '@/utils/validation';
 
 /**
  * Login screen with modern UI design
  * Supports login with email or phone number
  */
 export const LoginScreen = () => {
-  const [emailOrPhone, setEmailOrPhone] = useState('');
-  const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
-
   const { t } = useAuthTranslation();
   const { login, isLoggingIn } = useAuth();
   const { setUser } = useAuthStore();
 
-  const handleLogin = async () => {
-    if (!emailOrPhone.trim() || !password.trim()) {
-      Alert.alert(t('errors.loginFailed'), t('errors.fillAllFields'));
-      return;
-    }
+  // Create form with Zod validation
+  const form = useForm<LoginFormData>({
+    resolver: zodResolver(createLoginSchema(t)),
+    defaultValues: {
+      emailOrPhone: '',
+      password: '',
+    },
+    mode: 'onTouched',
+  });
 
+  const onSubmit = async (data: LoginFormData) => {
     try {
       await login({
-        emailOrPhone: emailOrPhone.trim(),
-        password,
+        emailOrPhone: data.emailOrPhone.trim(),
+        password: data.password,
       });
 
       // Login successful, now get user profile
@@ -80,68 +84,58 @@ export const LoginScreen = () => {
           </View>
 
           {/* Login Form */}
-          <View className='space-y-6'>
-            <View>
-              <Text className='mb-2 text-sm font-medium text-orange-800'>
-                {t('form.emailOrPhone')}
-              </Text>
-              <Input
-                value={emailOrPhone}
-                onChangeText={setEmailOrPhone}
+          <FormProvider {...form}>
+            <View className='space-y-6'>
+              <InputText
+                name='emailOrPhone'
+                label={t('form.emailOrPhone')}
                 placeholder={t('form.emailOrPhone')}
                 keyboardType='email-address'
                 autoCapitalize='none'
                 autoComplete='email'
                 textContentType='emailAddress'
-                className='border-orange-200 bg-white focus:border-orange-400'
+                required
+                labelStyle={{ color: '#9a3412' }}
+                inputStyle={{
+                  borderColor: '#fed7aa',
+                  backgroundColor: 'white',
+                }}
               />
-            </View>
 
-            <View>
-              <Text className='mb-2 text-sm font-medium text-orange-800'>
-                {t('form.password')}
-              </Text>
-              <View className='relative'>
-                <Input
-                  value={password}
-                  onChangeText={setPassword}
-                  placeholder={t('form.password')}
-                  secureTextEntry={!showPassword}
-                  autoComplete='password'
-                  textContentType='password'
-                  className='border-orange-200 bg-white pr-12 focus:border-orange-400'
-                />
-                <TouchableOpacity
-                  onPress={() => setShowPassword(!showPassword)}
-                  className='absolute right-3 top-1/2 -translate-y-1/2'
-                >
+              <InputText
+                name='password'
+                label={t('form.password')}
+                placeholder={t('form.password')}
+                isPassword
+                required
+                labelStyle={{ color: '#9a3412' }}
+                inputStyle={{
+                  borderColor: '#fed7aa',
+                  backgroundColor: 'white',
+                }}
+              />
+
+              {/* Forgot Password Link */}
+              <Link href='/auth/forgot-password' asChild>
+                <TouchableOpacity className='self-end'>
                   <Text className='text-sm font-medium text-orange-600'>
-                    {showPassword ? 'Hide' : 'Show'}
+                    {t('forgotPassword')}
                   </Text>
                 </TouchableOpacity>
-              </View>
+              </Link>
+
+              {/* Login Button */}
+              <Button
+                title={isLoggingIn ? t('signingIn') : t('login')}
+                onPress={form.handleSubmit(onSubmit)}
+                disabled={isLoggingIn || !form.formState.isValid}
+                loading={isLoggingIn}
+                variant='primary'
+                fullWidth
+                style={{ marginTop: 32, backgroundColor: '#f97316' }}
+              />
             </View>
-
-            {/* Forgot Password Link */}
-            <Link href='/auth/forgot-password' asChild>
-              <TouchableOpacity className='self-end'>
-                <Text className='text-sm font-medium text-orange-600'>
-                  {t('forgotPassword')}
-                </Text>
-              </TouchableOpacity>
-            </Link>
-
-            {/* Login Button */}
-            <Button
-              title={isLoggingIn ? t('signingIn') : t('login')}
-              onPress={handleLogin}
-              disabled={isLoggingIn}
-              loading={isLoggingIn}
-              variant='primary'
-              fullWidth
-              style={{ marginTop: 32, backgroundColor: '#f97316' }}
-            />
-          </View>
+          </FormProvider>
 
           {/* Register Link */}
           <View className='mt-8 flex-row items-center justify-center'>

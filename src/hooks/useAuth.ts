@@ -59,7 +59,7 @@ export const useAuth = () => {
 
   // Logout mutation
   const logoutMutation = useMutation({
-    mutationFn: authService.logout,
+    mutationFn: () => authService.logout(),
     onSuccess: () => {
       // Clear all auth-related data
       queryClient.setQueryData(AUTH_QUERY_KEYS.isAuthenticated, false);
