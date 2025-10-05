@@ -297,7 +297,12 @@ export const InputSelect = <
                   setSearchQuery('');
                 }}
               >
-                <View className='mx-4 mt-20 max-h-[80%] rounded-lg bg-white shadow-lg'>
+                {/* <View className='mx-4 mt-20 max-h-[80%] rounded-lg bg-white shadow-lg'> */}
+                <TouchableOpacity
+                  className='mx-4 mt-20 max-h-[80%] rounded-lg bg-white shadow-lg'
+                  activeOpacity={1}
+                  onPress={e => e.stopPropagation()}
+                >
                   {/* Modal Header with Search */}
                   <View className='border-b border-neutral-light px-4 py-3'>
                     {searchable ? (
@@ -361,7 +366,8 @@ export const InputSelect = <
                       </TouchableOpacity>
                     </View>
                   )}
-                </View>
+                  {/* </View> */}
+                </TouchableOpacity>
               </TouchableOpacity>
             </Modal>
           </View>
