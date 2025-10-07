@@ -45,5 +45,19 @@
     "skip": "Bỏ qua",
     "done": "Hoàn thành",
     "close": "Đóng"
+  },
+  "home": {
+    "latestBranches": "Chi Nhánh Mới Nhất",
+    "discoverLocations": "Khám phá các địa điểm mới nhất của chúng tôi",
+    "noBranchesAvailable": "Không có chi nhánh nào",
+    "loadingBranches": "Đang tải chi nhánh...",
+    "failedToLoadBranches": "Không thể tải chi nhánh",
+    "tapToRetry": "Nhấn để thử lại",
+    "browseByProvince": "Duyệt Theo Tỉnh Thành",
+    "selectDestination": "Chọn điểm đến của bạn",
+    "noProvincesAvailable": "Không có tỉnh thành nào",
+    "loadingProvinces": "Đang tải tỉnh thành...",
+    "failedToLoadProvinces": "Không thể tải tỉnh thành",
+    "branchesIn": "Chi nhánh tại {{province}}"
   }
 }

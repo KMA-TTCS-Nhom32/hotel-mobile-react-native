@@ -4,6 +4,7 @@ import type {
 } from '@ahomevilla-hotel/node-sdk';
 import axios, { AxiosError } from 'axios';
 import type { AxiosResponse } from 'axios';
+import i18n from 'i18next';
 
 import { ENV, IS_PRODUCTION } from '@/config';
 import { Storage } from '@/utils/storage';
@@ -176,24 +177,27 @@ const privateRequest = axios.create({
   timeout: IS_PRODUCTION ? 15000 : 30000,
 });
 
-// Request interceptor to add auth token
+// Request interceptor to add auth token and language header
 privateRequest.interceptors.request.use(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   async (config: any) => {
     try {
+      // Add current language to accept-language header
+      const currentLanguage = i18n.language || 'en';
+      config.headers = config.headers || {};
+      config.headers['accept-language'] = currentLanguage;
+
       // Check if token is expired and refresh if needed
       const isExpired = await TokenManager.isTokenExpired();
 
       if (isExpired) {
         const newToken = await TokenManager.refreshToken();
         if (newToken) {
-          config.headers = config.headers || {};
           config.headers.Authorization = `Bearer ${newToken}`;
         }
       } else {
         const accessToken = await TokenManager.getAccessToken();
         if (accessToken) {
-          config.headers = config.headers || {};
           config.headers.Authorization = `Bearer ${accessToken}`;
         }
       }

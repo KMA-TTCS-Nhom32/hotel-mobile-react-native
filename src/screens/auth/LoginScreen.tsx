@@ -5,7 +5,6 @@ import {
   View,
   Text,
   Image,
-  Alert,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -18,6 +17,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useAuthTranslation } from '@/i18n/hooks';
 import { authService } from '@/services/auth/authService';
 import { useAuthStore } from '@/store/authStore';
+import { showErrorToast, showSuccessToast } from '@/utils/toast';
 import { createLoginSchema, LoginFormData } from '@/utils/validation';
 
 /**
@@ -50,11 +50,16 @@ export const LoginScreen = () => {
       const userProfile = await authService.getProfile();
       setUser(userProfile);
 
+      // Show success message
+      showSuccessToast(t('success.loginSuccess'), t('welcome'));
+
       // Navigation will be handled by the ProtectedRoute wrapper
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : t('errors.generic');
-      Alert.alert(t('errors.loginFailed'), errorMessage);
+
+      // Show error toast instead of Alert
+      showErrorToast(errorMessage, t('errors.loginFailed'));
     }
   };
 

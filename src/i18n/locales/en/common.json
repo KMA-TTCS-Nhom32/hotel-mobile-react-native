@@ -45,5 +45,19 @@
     "skip": "Skip",
     "done": "Done",
     "close": "Close"
+  },
+  "home": {
+    "latestBranches": "Latest Branches",
+    "discoverLocations": "Discover our newest locations",
+    "noBranchesAvailable": "No branches available",
+    "loadingBranches": "Loading latest branches...",
+    "failedToLoadBranches": "Failed to load branches",
+    "tapToRetry": "Tap to retry",
+    "browseByProvince": "Browse by Province",
+    "selectDestination": "Select your destination",
+    "noProvincesAvailable": "No provinces available",
+    "loadingProvinces": "Loading provinces...",
+    "failedToLoadProvinces": "Failed to load provinces",
+    "branchesIn": "Branches in {{province}}"
   }
 }

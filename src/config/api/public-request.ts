@@ -1,4 +1,5 @@
 import axios from 'axios';
+import i18n from 'i18next';
 
 import { ENV, IS_PRODUCTION } from '@/config';
 
@@ -9,5 +10,21 @@ const publicRequest = axios.create({
   },
   timeout: IS_PRODUCTION ? 15000 : 30000, // Longer timeout in development
 });
+
+// Request interceptor to add accept-language header
+publicRequest.interceptors.request.use(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  async (config: any) => {
+    // Add current language to accept-language header
+    const currentLanguage = i18n.language || 'en';
+    config.headers = config.headers || {};
+    config.headers['accept-language'] = currentLanguage;
+
+    return config;
+  },
+  error => {
+    return Promise.reject(error);
+  }
+);
 
 export default publicRequest;

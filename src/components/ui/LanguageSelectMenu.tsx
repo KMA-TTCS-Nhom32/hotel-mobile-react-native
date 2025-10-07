@@ -1,4 +1,5 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
+import { useQueryClient } from '@tanstack/react-query';
 import React, { useState } from 'react';
 import { Modal, Pressable, Text, TouchableOpacity, View } from 'react-native';
 
@@ -7,13 +8,19 @@ import { useLanguage } from '@/i18n/hooks';
 export const LanguageSelectMenu: React.FC = () => {
   const { currentLanguage, changeLanguage, availableLanguages } = useLanguage();
   const [isOpen, setIsOpen] = useState(false);
+  const queryClient = useQueryClient();
 
   const currentLang = availableLanguages.find(
     lang => lang.code === currentLanguage
   );
 
-  const handleSelect = (languageCode: string) => {
-    changeLanguage(languageCode);
+  const handleSelect = async (languageCode: string) => {
+    // Change language
+    await changeLanguage(languageCode);
+
+    // Invalidate all queries to refetch data with new language
+    queryClient.invalidateQueries();
+
     setIsOpen(false);
   };
 

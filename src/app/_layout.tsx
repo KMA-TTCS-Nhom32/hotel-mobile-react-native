@@ -3,6 +3,7 @@ import './styles/global.css';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Stack } from 'expo-router';
 import React from 'react';
+import Toast from 'react-native-toast-message';
 
 import { ProtectedRoute } from '@/components/layout';
 
@@ -27,6 +28,8 @@ export default function RootLayout() {
           <Stack.Screen name='(tabs)' options={{ headerShown: false }} />
         </Stack>
       </ProtectedRoute>
+      {/* Toast notifications - must be at root level */}
+      <Toast />
     </QueryClientProvider>
   );
 }
