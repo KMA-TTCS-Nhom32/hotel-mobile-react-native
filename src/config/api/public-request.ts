@@ -13,8 +13,7 @@ const publicRequest = axios.create({
 
 // Request interceptor to add accept-language header
 publicRequest.interceptors.request.use(
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  async (config: any) => {
+  async config => {
     // Add current language to accept-language header
     const currentLanguage = i18n.language || 'en';
     config.headers = config.headers || {};

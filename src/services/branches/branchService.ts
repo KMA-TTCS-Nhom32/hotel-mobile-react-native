@@ -1,4 +1,4 @@
-import type { Branch } from '@ahomevilla-hotel/node-sdk';
+import type { Branch, BranchDetail } from '@ahomevilla-hotel/node-sdk';
 
 import { ENDPOINTS, publicRequest } from '@/config/api';
 import type { BranchFilters } from '@/types/filters';
@@ -56,6 +56,20 @@ export class BranchService implements IBranchService {
       return response.data;
     } catch (error) {
       throw handleServiceError(error, 'Failed to fetch branches');
+    }
+  }
+
+  /**
+   * Get branch details by ID or slug
+   */
+  async getBranchDetail(idOrSlug: string): Promise<BranchDetail> {
+    try {
+      const response = await publicRequest.get<BranchDetail>(
+        `${ENDPOINTS.BRANCHES}/${idOrSlug}`
+      );
+      return response.data;
+    } catch (error) {
+      throw handleServiceError(error, 'Failed to fetch branch details');
     }
   }
 }

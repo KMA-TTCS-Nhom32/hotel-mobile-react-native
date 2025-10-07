@@ -1,25 +1,25 @@
 import type { Branch } from '@ahomevilla-hotel/node-sdk';
 import React from 'react';
-import { Dimensions, Text, View } from 'react-native';
+import { Text, View, useWindowDimensions } from 'react-native';
 import Carousel from 'react-native-reanimated-carousel';
 
 import { BranchCard } from '@/components/home/BranchCard';
-import { useCommonTranslation } from '@/i18n/hooks';
+import { useCommonTranslation, useLanguage } from '@/i18n/hooks';
 
 interface BranchCarouselProps {
   branches: Branch[];
   onBranchPress?: (branch: Branch) => void;
 }
 
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
-const CARD_WIDTH = SCREEN_WIDTH * 0.85;
-const CARD_HEIGHT = 200;
-
 export const BranchCarousel: React.FC<BranchCarouselProps> = ({
   branches,
   onBranchPress,
 }) => {
   const { t } = useCommonTranslation();
+  const { currentLanguage } = useLanguage();
+  const { width: SCREEN_WIDTH } = useWindowDimensions();
+  const CARD_WIDTH = SCREEN_WIDTH * 0.85;
+  const CARD_HEIGHT = 200;
 
   if (!branches || branches.length === 0) {
     return null;
@@ -46,6 +46,7 @@ export const BranchCarousel: React.FC<BranchCarouselProps> = ({
               branch={item}
               onPress={onBranchPress}
               height={CARD_HEIGHT}
+              lng={currentLanguage}
             />
           </View>
         )}

@@ -203,6 +203,7 @@ export const ProvinceSection: React.FC<ProvinceSectionProps> = ({
                   onPress={onBranchPress}
                   width={CARD_WIDTH}
                   height={180}
+                  lng={currentLanguage}
                 />
               ))}
             </View>

@@ -26,6 +26,11 @@ export default function RootLayout() {
       <ProtectedRoute>
         <Stack>
           <Stack.Screen name='(tabs)' options={{ headerShown: false }} />
+          <Stack.Screen
+            name='branches/[idOrSlug]'
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen name='rooms/[id]' options={{ headerShown: false }} />
         </Stack>
       </ProtectedRoute>
       {/* Toast notifications - must be at root level */}
