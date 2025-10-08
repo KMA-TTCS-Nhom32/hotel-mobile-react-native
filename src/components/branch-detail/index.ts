@@ -1,6 +1,7 @@
+export { AmenitiesSection } from './AmenitiesSection';
+export { BookNowButton } from './BookNowButton';
 export { BranchImageGallery } from './BranchImageGallery';
 export { BranchInfoSection } from './BranchInfoSection';
-export { AmenitiesSection } from './AmenitiesSection';
-export { RoomsSection } from './RoomsSection';
+export { LocationMapPreview } from './LocationMapPreview';
 export { NearbyPlacesSection } from './NearbyPlacesSection';
-export { BookNowButton } from './BookNowButton';
+export { RoomsSection } from './RoomsSection';

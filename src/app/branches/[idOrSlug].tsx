@@ -3,17 +3,20 @@ import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { Linking, Pressable, ScrollView, View } from 'react-native';
+import { showLocation } from 'react-native-map-link';
 
 import { AmenitiesSection } from '@/components/branch-detail/AmenitiesSection';
 import { BookNowButton } from '@/components/branch-detail/BookNowButton';
 import { BranchImageGallery } from '@/components/branch-detail/BranchImageGallery';
 import { BranchInfoSection } from '@/components/branch-detail/BranchInfoSection';
+import { LocationMapPreview } from '@/components/branch-detail/LocationMapPreview';
 import { NearbyPlacesSection } from '@/components/branch-detail/NearbyPlacesSection';
 import { RoomsSection } from '@/components/branch-detail/RoomsSection';
 import { Screen } from '@/components/layout';
 import { ErrorState, LoadingSpinner } from '@/components/ui';
 import { useBranchDetail } from '@/hooks/useBranchDetail';
 import { useCommonTranslation, useLanguage } from '@/i18n/hooks';
+import type { Location } from '@/types/location';
 
 /**
  * Branch Detail Screen
@@ -59,10 +62,30 @@ export default function BranchDetailScreen() {
     }
   };
 
-  const handleDirectionsPress = () => {
-    // TODO: Add location coordinates to backend BranchDetail model
-    // For now, search by address
-    if (branch?.address) {
+  const handleDirectionsPress = async () => {
+    console.log(
+      'real name',
+      displayData.name.replace('AHomeVilla', 'M Village')
+    );
+    if (branch?.location) {
+      try {
+        await showLocation({
+          latitude: parseFloat(branch.location.latitude),
+          longitude: parseFloat(branch.location.longitude),
+          title: displayData.name.replace('AHomeVilla', 'M Village'),
+          googlePlaceId: branch.location.google_place_id
+            ? decodeURIComponent(branch.location.google_place_id)
+            : undefined,
+          dialogTitle: 'Open in Maps',
+          dialogMessage: 'Choose your preferred map app',
+          cancelText: 'Cancel',
+          alwaysIncludeGoogle: true,
+        });
+      } catch (error) {
+        console.error('Error opening maps:', error);
+      }
+    } else if (branch?.address) {
+      // Fallback to address search
       const encodedAddress = encodeURIComponent(branch.address);
       const url = `https://www.google.com/maps/search/?api=1&query=${encodedAddress}`;
       Linking.openURL(url);
@@ -145,6 +168,17 @@ export default function BranchDetailScreen() {
             rating={branch.rating}
             province={branch.province}
           />
+
+          {/* Location Map Preview */}
+          {branch.location && (
+            <View className='mb-6'>
+              <LocationMapPreview
+                location={branch.location as Location}
+                label={displayData.name.replace('AHomeVilla', 'M Village')}
+                height={200}
+              />
+            </View>
+          )}
 
           {/* Amenities */}
           {branch.amenities && branch.amenities.length > 0 && (

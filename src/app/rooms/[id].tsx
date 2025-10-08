@@ -22,15 +22,6 @@ import { Button, ErrorState, LoadingSpinner } from '@/components/ui';
 import { useRoomDetail } from '@/hooks/useRoomDetail';
 import { useCommonTranslation } from '@/i18n/hooks';
 
-interface BookingData {
-  type: BookingType;
-  date?: Date;
-  checkInDate?: Date;
-  checkOutDate?: Date;
-  checkInTime?: string;
-  duration?: number;
-}
-
 /**
  * Calculate the next available time slot based on current time
  * Rounds up to the nearest 30-minute interval within business hours (9:00-20:00)
@@ -151,32 +142,6 @@ export default function RoomDetailScreen() {
 
   const { data: room, isLoading, isError, error, refetch } = useRoomDetail(id);
 
-  // Get current booking data based on selected type
-  const getCurrentBookingData = useCallback((): BookingData => {
-    if (bookingType === 'HOURLY') {
-      return {
-        type: 'HOURLY',
-        date: hourlyData.date,
-        checkInTime: hourlyData.checkInTime,
-        duration: hourlyData.duration,
-      };
-    }
-    if (bookingType === 'NIGHTLY') {
-      return {
-        type: 'NIGHTLY',
-        date: nightlyData.date,
-      };
-    }
-    if (bookingType === 'DAILY') {
-      return {
-        type: 'DAILY',
-        checkInDate: dailyData.checkInDate,
-        checkOutDate: dailyData.checkOutDate,
-      };
-    }
-    return { type: bookingType };
-  }, [bookingType, hourlyData, nightlyData, dailyData]);
-
   const handleBookingTypeChange = (type: BookingType) => {
     setBookingType(type);
     // No need to reset form data - each type maintains its own state
@@ -195,9 +160,90 @@ export default function RoomDetailScreen() {
   }, []);
 
   const handleProceedToPayment = () => {
-    const bookingData = getCurrentBookingData();
-    // TODO: Navigate to payment screen with booking data
-    console.log('Proceed to payment:', bookingData);
+    if (!room) return;
+
+    // Calculate dates and times based on booking type
+    let startDate: string;
+    let endDate: string;
+    let startTime: string;
+    let endTime: string;
+
+    if (bookingType === 'HOURLY' && hourlyData.date && hourlyData.checkInTime) {
+      // Hourly booking
+      startDate = hourlyData.date.toISOString().split('T')[0];
+      endDate = startDate; // Same day
+      startTime = hourlyData.checkInTime;
+
+      // Calculate end time based on duration
+      const [hours, minutes] = hourlyData.checkInTime.split(':').map(Number);
+      const endHours = hours + (hourlyData.duration || 2);
+      endTime = `${String(endHours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+    } else if (bookingType === 'NIGHTLY' && nightlyData.date) {
+      // Nightly booking (check-in today 14:00, check-out tomorrow 12:00)
+      startDate = nightlyData.date.toISOString().split('T')[0];
+      const nextDay = new Date(nightlyData.date);
+      nextDay.setDate(nextDay.getDate() + 1);
+      endDate = nextDay.toISOString().split('T')[0];
+      startTime = '14:00';
+      endTime = '12:00';
+    } else if (
+      bookingType === 'DAILY' &&
+      dailyData.checkInDate &&
+      dailyData.checkOutDate
+    ) {
+      // Daily booking
+      startDate = dailyData.checkInDate.toISOString().split('T')[0];
+      endDate = dailyData.checkOutDate.toISOString().split('T')[0];
+      startTime = '14:00';
+      endTime = '12:00';
+    } else {
+      return; // Invalid booking data
+    }
+
+    // Calculate total price
+    const calculatePrice = () => {
+      if (bookingType === 'HOURLY' && hourlyData.duration) {
+        const pricePerHour = Number(
+          room.special_price_per_hour || room.base_price_per_hour
+        );
+        return pricePerHour * hourlyData.duration;
+      }
+      if (bookingType === 'NIGHTLY') {
+        return Number(
+          room.special_price_per_night || room.base_price_per_night
+        );
+      }
+      if (
+        bookingType === 'DAILY' &&
+        dailyData.checkInDate &&
+        dailyData.checkOutDate
+      ) {
+        const days = Math.ceil(
+          (dailyData.checkOutDate.getTime() - dailyData.checkInDate.getTime()) /
+            (1000 * 60 * 60 * 24)
+        );
+        return (
+          Number(room.special_price_per_day || room.base_price_per_day) * days
+        );
+      }
+      return 0;
+    };
+
+    const totalPrice = calculatePrice();
+
+    // Navigate to payment screen with roomId (React Query will fetch from cache)
+    router.push({
+      pathname: '/payment',
+      params: {
+        roomId: room.id, // Pass only room ID - payment screen uses useRoomDetail to get cached data
+        bookingType,
+        startDate,
+        endDate,
+        startTime,
+        endTime,
+        price: totalPrice.toString(),
+      },
+    });
   };
 
   if (isLoading) {

@@ -15,4 +15,5 @@ export const ROUTES = {
   ROOMS: {
     DETAIL: (id: string) => `/rooms/${id}` as const,
   },
+  PAYMENT: '/payment',
 } as const;
