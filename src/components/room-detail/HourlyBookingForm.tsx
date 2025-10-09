@@ -28,8 +28,16 @@ export function HourlyBookingForm({
   _pricePerHour,
   disabled = false,
 }: HourlyBookingFormProps) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [localData, setLocalData] = useState<HourlyBookingData>(value);
+
+  const formatBookingDate = (date: Date) =>
+    date.toLocaleDateString(i18n.language, {
+      weekday: 'short',
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+    });
 
   // Calculate maximum hours based on check-in time
   const calculateMaxHours = (time: string): number => {
@@ -276,13 +284,7 @@ export function HourlyBookingForm({
                 {t('booking.checkIn')}
               </Text>
               <Text className='text-sm font-medium text-text-primary'>
-                {localData.date.toLocaleDateString('vi-VN', {
-                  weekday: 'short',
-                  day: '2-digit',
-                  month: '2-digit',
-                  year: 'numeric',
-                })}{' '}
-                - {localData.checkInTime}
+                {formatBookingDate(localData.date)} - {localData.checkInTime}
               </Text>
             </View>
 
@@ -292,13 +294,7 @@ export function HourlyBookingForm({
                 {t('booking.checkOut')}
               </Text>
               <Text className='text-sm font-medium text-text-primary'>
-                {localData.date.toLocaleDateString('vi-VN', {
-                  weekday: 'short',
-                  day: '2-digit',
-                  month: '2-digit',
-                  year: 'numeric',
-                })}{' '}
-                - {checkOutTime}
+                {formatBookingDate(localData.date)} - {checkOutTime}
               </Text>
             </View>
 

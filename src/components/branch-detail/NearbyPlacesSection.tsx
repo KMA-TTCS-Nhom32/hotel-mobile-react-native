@@ -23,8 +23,11 @@ export function NearbyPlacesSection({ nearBy }: NearbyPlacesSectionProps) {
 
       {nearBy.length > 0 ? (
         <View className='gap-3'>
-          {nearBy.map((place, index) => (
-            <View key={index} className='flex-row items-start gap-3'>
+          {nearBy.map(place => (
+            <View
+              key={`${place.name}-${place.distance}`}
+              className='flex-row items-start gap-3'
+            >
               <View className='mt-1'>
                 <MaterialIcons
                   name='place'

@@ -1,5 +1,5 @@
 import type { Branch } from '@ahomevilla-hotel/node-sdk';
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Text, View, useWindowDimensions } from 'react-native';
 import Carousel from 'react-native-reanimated-carousel';
 
@@ -18,7 +18,7 @@ export const BranchCarousel: React.FC<BranchCarouselProps> = ({
   const { t } = useCommonTranslation();
   const { currentLanguage } = useLanguage();
   const { width: SCREEN_WIDTH } = useWindowDimensions();
-  const CARD_WIDTH = SCREEN_WIDTH * 0.85;
+  const CARD_WIDTH = useMemo(() => SCREEN_WIDTH * 0.85, [SCREEN_WIDTH]);
   const CARD_HEIGHT = 200;
 
   if (!branches || branches.length === 0) {

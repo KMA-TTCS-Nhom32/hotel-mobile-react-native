@@ -4,6 +4,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { Linking, Pressable, ScrollView, View } from 'react-native';
 import { showLocation } from 'react-native-map-link';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { AmenitiesSection } from '@/components/branch-detail/AmenitiesSection';
 import { BookNowButton } from '@/components/branch-detail/BookNowButton';
@@ -28,6 +29,7 @@ export default function BranchDetailScreen() {
   const { t } = useCommonTranslation();
 
   const { currentLanguage } = useLanguage();
+  const insets = useSafeAreaInsets();
 
   const {
     data: branch,
@@ -122,7 +124,10 @@ export default function BranchDetailScreen() {
       <StatusBar style='light' />
 
       {/* Header with back button - Overlay on image */}
-      <View className='absolute left-0 right-0 top-12 z-10 flex-row items-center justify-between px-4'>
+      <View
+        className='absolute left-0 right-0 z-10 flex-row items-center justify-between px-4'
+        style={{ top: Math.max(insets.top, 12) }}
+      >
         <Pressable
           onPress={() => router.back()}
           className='h-10 w-10 items-center justify-center rounded-full bg-black/30 backdrop-blur-md active:opacity-70'
