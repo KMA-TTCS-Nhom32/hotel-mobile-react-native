@@ -35,7 +35,7 @@ import { showErrorToast, showSuccessToast } from '@/utils/toast';
 const BANKING_APPS = {
   MBBANK: {
     name: 'MB Bank',
-    scheme: 'mbbank://',
+    scheme: 'mbbank',
     qrScheme: 'mbbank://qr_payment',
     icon: '🏦',
   },
@@ -165,15 +165,20 @@ export default function QRConfirmationScreen() {
   const handleOpenBankingApp = async (bankKey: keyof typeof BANKING_APPS) => {
     try {
       const bank = BANKING_APPS[bankKey];
-      const bankScheme = bank.scheme;
+      let url = `${bank.scheme}://`;
+
+      if (bankKey === 'MBBANK' && params.qrCode) {
+        const encodedQrData = encodeURIComponent(params.qrCode);
+        url = `mbbank://qr-code/${encodedQrData}`;
+      }
 
       // Check if the banking app is installed
-      const canOpen = await Linking.canOpenURL(bankScheme);
+      const canOpen = await Linking.canOpenURL(url);
 
       if (canOpen) {
         // Open the banking app
         // For VietQR compatible apps, they will automatically detect QR code scan mode
-        await Linking.openURL(bankScheme);
+        await Linking.openURL(url);
         showSuccessToast(
           t('openBankApp') ||
             `Opening ${bank.name}. Please scan the QR code in the app.`
