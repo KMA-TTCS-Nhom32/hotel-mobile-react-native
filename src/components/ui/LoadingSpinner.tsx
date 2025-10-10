@@ -51,7 +51,7 @@ export const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
   if (variant === 'modern') {
     return (
       <View
-        style={[style, { backgroundColor: '#fef7ed' }]}
+        style={[style, { backgroundColor: 'transparent' }]}
         className={containerClass}
       >
         <View className='items-center justify-center rounded-full bg-white p-6 shadow-lg'>

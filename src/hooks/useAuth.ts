@@ -43,11 +43,15 @@ export const useAuth = () => {
   // Login mutation
   const loginMutation = useMutation({
     mutationFn: (credentials: LoginDto) => authService.login(credentials),
-    onSuccess: () => {
-      // Invalidate and refetch auth-related queries
-      queryClient.invalidateQueries({
+    onSuccess: async () => {
+      // Immediately update the auth state to true
+      queryClient.setQueryData(AUTH_QUERY_KEYS.isAuthenticated, true);
+
+      // Then refetch to ensure it's in sync
+      await queryClient.refetchQueries({
         queryKey: AUTH_QUERY_KEYS.isAuthenticated,
       });
+
       setIsInitialized(true);
     },
     onError: error => {

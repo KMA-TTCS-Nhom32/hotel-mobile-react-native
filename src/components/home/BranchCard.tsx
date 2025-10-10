@@ -8,14 +8,17 @@ interface BranchCardProps {
   onPress?: (branch: Branch) => void;
   width?: number;
   height?: number;
+  lng: string;
 }
 
 /**
  * Get display data from branch with translation fallback
  * Backend returns translations array with only the requested language (from accept-language header)
  */
-const getBranchDisplayData = (branch: Branch) => {
-  const translation = branch.translations?.[0]; // Backend only returns matching language
+const getBranchDisplayData = (branch: Branch, lng: string) => {
+  const translation = branch.translations?.find(
+    t => t.language === lng.toUpperCase()
+  );
 
   return {
     name: translation?.name || branch.name,
@@ -34,8 +37,9 @@ export const BranchCard: React.FC<BranchCardProps> = ({
   onPress,
   width,
   height = 200,
+  lng,
 }) => {
-  const { name, address } = getBranchDisplayData(branch);
+  const { name, address } = getBranchDisplayData(branch, lng);
 
   return (
     <TouchableOpacity

@@ -204,7 +204,17 @@ export const HEX_COLORS = {
     foreground: '#ffffff',
   },
   success: {
+    lightest: '#dcfce7',
+    lighter: '#bbf7d0',
     main: '#22c55e',
+    dark: '#16a34a',
+    foreground: '#ffffff',
+  },
+  warning: {
+    lightest: '#fef3c7',
+    lighter: '#fde68a',
+    main: '#f59e0b',
+    dark: '#d97706',
     foreground: '#ffffff',
   },
   error: {

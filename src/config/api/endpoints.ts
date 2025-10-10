@@ -12,7 +12,7 @@ export const ENDPOINTS = {
   RESET_PASSWORD: '/auth/forgot-password/email/reset',
   GET_USER: '/auth/profile',
   GET_MYBOOKING: '/booking/my-bookings',
-  CANCEL_BOOKING: '/booking/cancel',
+  CANCEL_BOOKING: (bookingId: string) => `/booking/cancel/${bookingId}`,
   //User
   //Province
   PROVINCE: '/provinces',
@@ -29,4 +29,12 @@ export const ENDPOINTS = {
 
   // Booking
   BOOKING: '/booking',
+
+  // Payment
+  CREATE_PAYMENT: '/payos/payment-request',
+  CANCEL_PAYMENT: '/payos/cancel-payment',
+  GET_PAYMENT_STATUS: '/payos/payment-status/:paymentLinkId',
+  GET_BANK_LIST:
+    process.env.EXPO_PUBLIC_VIETQR_BANK_LIST ||
+    'https://api.vietqr.io/v2/banks',
 };

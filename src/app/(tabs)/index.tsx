@@ -1,5 +1,6 @@
 import type { Branch } from '@ahomevilla-hotel/node-sdk';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import { useRouter, type Href } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import React, { useState } from 'react';
 import { ActivityIndicator, Animated, Text, View } from 'react-native';
@@ -8,6 +9,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { BranchCarousel } from '@/components/home/BranchCarousel';
 import { ProvinceSection } from '@/components/home/ProvinceSection';
 import { SearchBar } from '@/components/home/SearchBar';
+import { ROUTES } from '@/config/routes';
 import { useLatestBranches } from '@/hooks/useBranches';
 import { useCommonTranslation } from '@/i18n/hooks';
 
@@ -15,6 +17,7 @@ const STICKY_THRESHOLD = 80;
 
 export default function HomeScreen() {
   const { t } = useCommonTranslation();
+  const router = useRouter();
   const [isSticky, setIsSticky] = useState(false);
   const scrollY = new Animated.Value(0);
 
@@ -39,8 +42,8 @@ export default function HomeScreen() {
   );
 
   const handleBranchPress = (branch: Branch) => {
-    console.log('Branch pressed:', branch.name);
-    // TODO: Navigate to branch details
+    // Navigate to branch detail screen
+    router.push(ROUTES.BRANCHES.DETAIL(branch.slug) as Href);
   };
 
   const handleSearchPress = () => {

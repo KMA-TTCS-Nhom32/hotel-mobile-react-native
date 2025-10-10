@@ -9,4 +9,15 @@ export const ROUTES = {
   OFFERS: '/(tabs)/offers',
   PROMOTIONS: '/(tabs)/promotions',
   ACCOUNT: '/(tabs)/account',
+  BRANCHES: {
+    DETAIL: (idOrSlug: string) => `/branches/${idOrSlug}` as const,
+  },
+  ROOMS: {
+    DETAIL: (id: string) => `/rooms/${id}` as const,
+  },
+  PAYMENT: {
+    INDEX: '/payment',
+    QR_CONFIRMATION: '/payment/qr-confirmation',
+    SUCCESS: '/payment/success',
+  },
 } as const;

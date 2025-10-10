@@ -139,3 +139,5 @@ export const SUCCESS_MESSAGES = {
   DELETE_SUCCESS: 'Item deleted successfully!',
   SAVE_SUCCESS: 'Changes saved successfully!',
 } as const;
+
+export const DEFAULT_PAGE_SIZE = 10;

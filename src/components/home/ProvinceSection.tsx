@@ -14,6 +14,7 @@ import { BranchCard } from '@/components/home/BranchCard';
 import { useBranchesByProvince } from '@/hooks/useBranches';
 import { useProvinces } from '@/hooks/useProvinces';
 import { useCommonTranslation, useLanguage } from '@/i18n/hooks';
+import { findTranslation } from '@/utils/translations';
 
 interface ProvinceSectionProps {
   onBranchPress?: (branch: Branch) => void;
@@ -27,9 +28,7 @@ const CARD_WIDTH = SCREEN_WIDTH - 32; // Full width with padding
  * Backend returns translations array with only the requested language (from accept-language header)
  */
 const getProvinceName = (province: Province, lng: string): string => {
-  const translation = province.translations.find(
-    t => t.language === lng.toUpperCase()
-  );
+  const translation = findTranslation(province.translations, lng);
 
   return translation?.name || province.name;
 };
@@ -203,6 +202,7 @@ export const ProvinceSection: React.FC<ProvinceSectionProps> = ({
                   onPress={onBranchPress}
                   width={CARD_WIDTH}
                   height={180}
+                  lng={currentLanguage}
                 />
               ))}
             </View>

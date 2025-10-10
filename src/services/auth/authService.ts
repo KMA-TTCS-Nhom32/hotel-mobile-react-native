@@ -60,7 +60,11 @@ export class AuthService implements IAuthService {
 
       return response.data;
     } catch (error) {
-      await this.clearSession();
+      try {
+        await this.clearSession();
+      } catch (error) {
+        console.error('Failed to clear session:', error);
+      }
       throw handleServiceError(error, 'Token refresh failed');
     }
   };

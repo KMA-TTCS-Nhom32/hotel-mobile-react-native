@@ -102,6 +102,43 @@ export interface InputTextProps<
 }
 
 /**
+ * Props for InputTextarea component
+ */
+export interface InputTextareaProps<
+  TFieldValues extends FieldValues = FieldValues,
+  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
+> extends BaseFormFieldProps<TFieldValues, TName>,
+    Omit<
+      TextInputProps,
+      'value' | 'onChangeText' | 'onBlur' | 'style' | 'multiline'
+    > {
+  /**
+   * Input placeholder text
+   */
+  placeholder?: string;
+
+  /**
+   * Number of rows (lines) for the textarea
+   */
+  rows?: number;
+
+  /**
+   * Style for the TextInput component
+   */
+  inputStyle?: TextStyle;
+
+  /**
+   * Whether to show character count
+   */
+  showCharCount?: boolean;
+
+  /**
+   * Maximum character count
+   */
+  maxLength?: number;
+}
+
+/**
  * Option for select components
  */
 export interface SelectOption<T = string> {

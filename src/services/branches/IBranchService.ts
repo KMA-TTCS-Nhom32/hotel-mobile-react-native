@@ -1,4 +1,4 @@
-import type { Branch } from '@ahomevilla-hotel/node-sdk';
+import type { Branch, BranchDetail } from '@ahomevilla-hotel/node-sdk';
 
 import type { BranchFilters } from '@/types/filters';
 import type { PaginationResult } from '@/types/pagination';
@@ -26,4 +26,11 @@ export interface IBranchService {
     pageSize?: number,
     filters?: BranchFilters
   ): Promise<PaginationResult<Branch>>;
+
+  /**
+   * Get branch details by ID or slug
+   * @param idOrSlug - Branch ID or slug
+   * @returns Branch detail with rooms, amenities, and nearby places
+   */
+  getBranchDetail(idOrSlug: string): Promise<BranchDetail>;
 }

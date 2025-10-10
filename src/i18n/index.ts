@@ -5,8 +5,10 @@ import { initReactI18next } from 'react-i18next';
 // Import translation files
 import enAuth from './locales/en/auth.json';
 import enCommon from './locales/en/common.json';
+import enPayment from './locales/en/payment.json';
 import viAuth from './locales/vi/auth.json';
 import viCommon from './locales/vi/common.json';
+import viPayment from './locales/vi/payment.json';
 
 // Get device locale
 const deviceLanguage = getLocales()[0]?.languageCode || 'en';
@@ -16,10 +18,12 @@ const resources = {
   en: {
     common: enCommon,
     auth: enAuth,
+    payment: enPayment,
   },
   vi: {
     common: viCommon,
     auth: viAuth,
+    payment: viPayment,
   },
 };
 
@@ -36,7 +40,7 @@ i18n.use(initReactI18next).init({
   lng: deviceLanguage,
   fallbackLng: 'en',
   defaultNS: 'common',
-  ns: ['common', 'auth'],
+  ns: ['common', 'auth', 'payment'],
 
   interpolation: {
     escapeValue: false,

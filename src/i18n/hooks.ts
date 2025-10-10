@@ -17,6 +17,13 @@ export const useAuthTranslation = () => {
 };
 
 /**
+ * Custom hook for using translations with payment namespace
+ */
+export const usePaymentTranslation = () => {
+  return useTranslation('payment');
+};
+
+/**
  * Custom hook for language management
  */
 export const useLanguage = () => {
