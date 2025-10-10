@@ -3,6 +3,7 @@
  * Allows selecting payment method category and specific method
  */
 
+import { CreateBookingOnlineDtoPaymentMethodEnum } from '@ahomevilla-hotel/node-sdk';
 import {
   AntDesign,
   Ionicons,
@@ -14,15 +15,11 @@ import { Pressable, Text, View } from 'react-native';
 
 import { PAYMENT_OPTIONS } from '@/constants/payment';
 import { usePaymentTranslation } from '@/i18n/hooks';
-import type {
-  PaymentCategory,
-  PaymentMethod,
-  PaymentOption,
-} from '@/types/payment';
+import type { PaymentCategory, PaymentOption } from '@/types/payment';
 
 interface PaymentMethodSelectorProps {
-  selectedMethod?: PaymentMethod;
-  onChange: (method: PaymentMethod) => void;
+  selectedMethod?: CreateBookingOnlineDtoPaymentMethodEnum;
+  onChange: (method: CreateBookingOnlineDtoPaymentMethodEnum) => void;
 }
 
 export const PaymentMethodSelector: React.FC<PaymentMethodSelectorProps> = ({

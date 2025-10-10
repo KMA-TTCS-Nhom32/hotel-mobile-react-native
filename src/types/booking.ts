@@ -1,3 +1,5 @@
+import { formatDateForAPI } from '@/utils/format';
+
 /**
  * Standardized booking request format for API
  * This format applies to all booking types (HOURLY, NIGHTLY, DAILY)
@@ -8,16 +10,6 @@ export interface BookingRequest {
   end_date: string; // Format: DD-MM-YYYY
   start_time: string; // Format: HH:mm (24-hour)
   end_time: string; // Format: HH:mm (24-hour)
-}
-
-/**
- * Helper function to format date to DD-MM-YYYY
- */
-export function formatDateForAPI(date: Date): string {
-  const day = String(date.getDate()).padStart(2, '0');
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const year = date.getFullYear();
-  return `${day}-${month}-${year}`;
 }
 
 /**

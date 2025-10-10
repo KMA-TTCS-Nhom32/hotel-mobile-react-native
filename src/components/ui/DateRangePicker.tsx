@@ -6,6 +6,7 @@ import { Modal, Pressable, Text, View } from 'react-native';
 import { Calendar, DateData } from 'react-native-calendars';
 
 import { HEX_COLORS } from '@/config/colors';
+import { formatDateForCalendar, parseDateFromCalendar } from '@/utils/format';
 
 interface DateRange {
   startDate?: Date;
@@ -38,20 +39,8 @@ export function DateRangePicker({
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [tempRange, setTempRange] = useState<DateRange>(value);
 
-  const formatDateString = (date: Date): string => {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
-  };
-
-  const parseDate = (dateString: string): Date => {
-    const [year, month, day] = dateString.split('-').map(Number);
-    return new Date(year, month - 1, day);
-  };
-
   const handleDayPress = (day: DateData) => {
-    const selectedDate = parseDate(day.dateString);
+    const selectedDate = parseDateFromCalendar(day.dateString);
 
     if (!tempRange.startDate || (tempRange.startDate && tempRange.endDate)) {
       // First selection or resetting selection
@@ -90,7 +79,7 @@ export function DateRangePicker({
 
     if (!tempRange.startDate) return marked;
 
-    const startDateString = formatDateString(tempRange.startDate);
+    const startDateString = formatDateForCalendar(tempRange.startDate);
     marked[startDateString] = {
       startingDay: true,
       color: HEX_COLORS.primary.main,
@@ -98,14 +87,14 @@ export function DateRangePicker({
     };
 
     if (tempRange.endDate) {
-      const endDateString = formatDateString(tempRange.endDate);
+      const endDateString = formatDateForCalendar(tempRange.endDate);
 
       // Mark all dates in between
       const currentDate = new Date(tempRange.startDate);
       currentDate.setDate(currentDate.getDate() + 1);
 
       while (currentDate < tempRange.endDate) {
-        const dateString = formatDateString(currentDate);
+        const dateString = formatDateForCalendar(currentDate);
         marked[dateString] = {
           color: HEX_COLORS.primary.lighter,
           textColor: HEX_COLORS.text.primary,
@@ -189,7 +178,7 @@ export function DateRangePicker({
             {/* Calendar */}
             <View className='px-4 pt-4'>
               <Calendar
-                minDate={formatDateString(minDate)}
+                minDate={formatDateForCalendar(minDate)}
                 onDayPress={handleDayPress}
                 markingType='period'
                 markedDates={getMarkedDates()}

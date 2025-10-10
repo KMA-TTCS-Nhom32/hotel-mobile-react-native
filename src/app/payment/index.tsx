@@ -3,11 +3,16 @@
  * Allows users to review booking details and select payment method
  */
 
+import type { CreateBookingOnlineDto } from '@ahomevilla-hotel/node-sdk';
+import {
+  CreateBookingOnlineDtoPaymentMethodEnum,
+  CreateBookingOnlineDtoTypeEnum,
+} from '@ahomevilla-hotel/node-sdk/dist/models/create-booking-online-dto';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
-import { Alert, Pressable, ScrollView, Text, View } from 'react-native';
+import { Pressable, ScrollView, Text, View } from 'react-native';
 
 import { InputTextarea } from '@/components/forms';
 import { Screen } from '@/components/layout';
@@ -18,23 +23,23 @@ import {
   RoomBookingSummary,
 } from '@/components/payment';
 import { ErrorState, LoadingSpinner } from '@/components/ui';
+import { useCreateBooking } from '@/hooks/useCreateBooking';
+import { useCreatePaymentLink } from '@/hooks/useCreatePaymentLink';
 import { useRoomDetail } from '@/hooks/useRoomDetail';
 import { usePaymentTranslation } from '@/i18n/hooks';
-import type {
-  BookingFormData,
-  GuestCount,
-  PaymentMethod,
-} from '@/types/payment';
+import type { GuestCount } from '@/types/payment';
 import { formatCurrency } from '@/utils/format';
+import { showErrorToast } from '@/utils/toast';
 
 export default function PaymentScreen() {
   const router = useRouter();
   const { t } = usePaymentTranslation();
+
   const params = useLocalSearchParams<{
     // Room ID - will fetch from React Query cache
     roomId: string;
     // Booking details
-    bookingType: 'HOURLY' | 'NIGHTLY' | 'DAILY';
+    bookingType: CreateBookingOnlineDtoTypeEnum;
     startDate: string;
     endDate: string;
     startTime: string;
@@ -52,7 +57,9 @@ export default function PaymentScreen() {
   });
 
   const [selectedPaymentMethod, setSelectedPaymentMethod] =
-    React.useState<PaymentMethod>('CASH');
+    React.useState<CreateBookingOnlineDtoPaymentMethodEnum>(
+      CreateBookingOnlineDtoPaymentMethodEnum.Cash
+    );
 
   const [promotionCode, setPromotionCode] = React.useState<string>('');
 
@@ -67,41 +74,108 @@ export default function PaymentScreen() {
   const discount = 0; // TODO: Calculate discount based on promotion code
   const totalPrice = basePrice - discount;
 
+  // Booking creation mutation
+  const { mutate: createBooking, isPending: isCreatingBooking } =
+    useCreateBooking({
+      onSuccess: booking => {
+        // Check payment method to determine next step
+        if (
+          selectedPaymentMethod === CreateBookingOnlineDtoPaymentMethodEnum.Cash
+        ) {
+          // For CASH payment, navigate directly to success screen
+          router.push({
+            pathname: '/payment/success' as any,
+            params: {
+              orderCode: booking.code,
+              paymentMethod: CreateBookingOnlineDtoPaymentMethodEnum.Cash,
+            },
+          });
+        } else if (
+          selectedPaymentMethod ===
+          CreateBookingOnlineDtoPaymentMethodEnum.VietQr
+        ) {
+          // For online payment, create payment link
+          createPaymentLink({
+            bookingCode: booking.code,
+            amount: totalPrice,
+            items: room
+              ? [{ name: room.name, quantity: 1, price: basePrice }]
+              : undefined,
+          });
+        } else {
+          // Fallback for other payment methods
+          router.push({
+            pathname: '/payment/success' as any,
+            params: {
+              orderCode: booking.code,
+              paymentMethod: selectedPaymentMethod,
+            },
+          });
+        }
+      },
+      onError: error => {
+        showErrorToast(
+          error.message ||
+            t('bookingErrorMessage') ||
+            'Failed to create booking. Please try again.',
+          t('bookingError') || 'Booking Failed'
+        );
+      },
+    });
+
+  // Payment link creation mutation
+  const { mutate: createPaymentLink, isPending: isCreatingPaymentLink } =
+    useCreatePaymentLink({
+      onSuccess: paymentData => {
+        // Navigate to QR confirmation screen with payment data
+        router.push({
+          pathname: '/payment/qr-confirmation' as any,
+          params: {
+            qrCode: paymentData.qrCode,
+            accountName: paymentData.accountName,
+            accountNumber: paymentData.accountNumber,
+            bin: paymentData.bin,
+            amount: paymentData.amount.toString(),
+            orderCode: paymentData.orderCode,
+          },
+        });
+      },
+      onError: error => {
+        console.log('fail to create booking', error.message);
+        showErrorToast(
+          error.message ||
+            t('paymentErrorMessage') ||
+            'Failed to create payment link. Please try again or use cash payment.',
+          t('paymentError') || 'Payment Failed'
+        );
+      },
+    });
+
   const handleBooking = () => {
     if (!room) return;
 
-    const bookingData: BookingFormData = {
-      detailId: room.id,
+    const bookingData: CreateBookingOnlineDto = {
       type: params.bookingType,
+      detailId: room.id,
       start_date: params.startDate,
       end_date: params.endDate,
       start_time: params.startTime,
       end_time: params.endTime,
-      number_of_guests: guests.adults + guests.children + guests.infants,
+      number_of_guests: guests.adults,
       adults: guests.adults,
       children: guests.children,
       infants: guests.infants,
       special_requests: form.getValues('special_requests'),
-      promotion_code: promotionCode || undefined,
       payment_method: selectedPaymentMethod,
-      is_business_trip: false,
     };
 
-    // TODO: Call booking API with bookingData
-    console.log('Booking data:', bookingData);
-
-    // For now, show success alert
-    Alert.alert(
-      t('bookingConfirmed'),
-      `${t('bookingConfirmedMessage')}\n${t('paymentMethodLabel')}: ${selectedPaymentMethod}`,
-      [
-        {
-          text: 'OK',
-          onPress: () => router.push('/(tabs)/bookings'),
-        },
-      ]
-    );
+    console.log('booking payload', bookingData);
+    // Create booking via API
+    createBooking(bookingData);
   };
+
+  // Check if booking or payment link is being created
+  const isProcessing = isCreatingBooking || isCreatingPaymentLink;
 
   // Show loading state while fetching room data
   if (isLoading) {
@@ -133,7 +207,7 @@ export default function PaymentScreen() {
       <StatusBar style='dark' />
 
       {/* Header */}
-      <View className='border-b border-neutral-lighter bg-white px-4 py-4'>
+      <View className='mt-12 flex-row items-center justify-center border-b border-neutral-lighter bg-white px-4 py-4'>
         <Text className='text-xl font-bold text-neutral-darkest'>
           {t('title')}
         </Text>
@@ -242,11 +316,23 @@ export default function PaymentScreen() {
       <View className='absolute bottom-0 left-0 right-0 border-t border-neutral-lighter bg-white px-4 py-4'>
         <Pressable
           onPress={handleBooking}
+          disabled={isProcessing}
           className='w-full rounded-xl bg-primary-main py-4 active:opacity-80'
+          style={{ opacity: isProcessing ? 0.6 : 1 }}
         >
-          <Text className='text-center text-base font-bold text-white'>
-            {t('confirmBooking')} • {formatCurrency(totalPrice)}
-          </Text>
+          {isProcessing ? (
+            <View className='flex-row items-center justify-center gap-2'>
+              <Text className='text-center text-base font-bold text-white'>
+                {isCreatingBooking
+                  ? t('creatingBooking') || 'Creating booking...'
+                  : t('processingPayment') || 'Processing payment...'}
+              </Text>
+            </View>
+          ) : (
+            <Text className='text-center text-base font-bold text-white'>
+              {t('confirmBooking')} • {formatCurrency(totalPrice)}
+            </Text>
+          )}
         </Pressable>
       </View>
     </Screen>

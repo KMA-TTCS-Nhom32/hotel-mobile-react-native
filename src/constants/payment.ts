@@ -3,6 +3,8 @@
  * Constants for payment methods and options
  */
 
+import { CreateBookingOnlineDtoPaymentMethodEnum } from '@ahomevilla-hotel/node-sdk';
+
 import type { PaymentOption } from '@/types/payment';
 
 /**
@@ -23,7 +25,7 @@ export const PAYMENT_OPTIONS: PaymentOption[] = [
   // Pay at Hotel - direct method (no sub-options)
   {
     id: 'pay-at-hotel',
-    method: 'CASH',
+    method: CreateBookingOnlineDtoPaymentMethodEnum.Cash,
     category: 'PAY_AT_HOTEL',
     label: 'payAtHotel', // i18n key
     description: 'payAtHotelDescription', // i18n key
@@ -32,7 +34,7 @@ export const PAYMENT_OPTIONS: PaymentOption[] = [
   // Online Checkout
   {
     id: 'momo',
-    method: 'MOMO',
+    method: CreateBookingOnlineDtoPaymentMethodEnum.Momo,
     category: 'ONLINE_CHECKOUT',
     label: 'momo', // i18n key
     description: 'momoDescription', // i18n key
@@ -40,7 +42,7 @@ export const PAYMENT_OPTIONS: PaymentOption[] = [
   },
   {
     id: 'vietqr',
-    method: 'VIET_QR',
+    method: CreateBookingOnlineDtoPaymentMethodEnum.VietQr,
     category: 'ONLINE_CHECKOUT',
     label: 'vietqr', // i18n key
     description: 'vietqrDescription', // i18n key

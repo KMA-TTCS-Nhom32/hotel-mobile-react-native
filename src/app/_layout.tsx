@@ -31,6 +31,15 @@ export default function RootLayout() {
             options={{ headerShown: false }}
           />
           <Stack.Screen name='rooms/[id]' options={{ headerShown: false }} />
+          <Stack.Screen name='payment/index' options={{ headerShown: false }} />
+          <Stack.Screen
+            name='payment/qr-confirmation'
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen
+            name='payment/success'
+            options={{ headerShown: false }}
+          />
         </Stack>
       </ProtectedRoute>
       {/* Toast notifications - must be at root level */}

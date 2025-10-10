@@ -15,5 +15,9 @@ export const ROUTES = {
   ROOMS: {
     DETAIL: (id: string) => `/rooms/${id}` as const,
   },
-  PAYMENT: '/payment',
+  PAYMENT: {
+    INDEX: '/payment',
+    QR_CONFIRMATION: '/payment/qr-confirmation',
+    SUCCESS: '/payment/success',
+  },
 } as const;

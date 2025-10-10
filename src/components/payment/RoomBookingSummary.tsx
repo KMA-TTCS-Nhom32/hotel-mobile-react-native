@@ -33,11 +33,17 @@ export const RoomBookingSummary: React.FC<RoomBookingSummaryProps> = ({
       <View className='flex-row gap-3'>
         {/* Thumbnail */}
         <View className='h-20 w-20 overflow-hidden rounded-lg'>
-          <Image
-            source={{ uri: room.thumbnail.url }}
-            style={{ width: '100%', height: '100%' }}
-            contentFit='cover'
-          />
+          {room.thumbnail?.url ? (
+            <Image
+              source={{ uri: room.thumbnail.url }}
+              style={{ width: '100%', height: '100%' }}
+              contentFit='cover'
+            />
+          ) : (
+            <View className='flex-1 items-center justify-center bg-neutral-lighter'>
+              <Text className='text-sm text-neutral-dark'>No Image</Text>
+            </View>
+          )}
         </View>
 
         {/* Room Details */}

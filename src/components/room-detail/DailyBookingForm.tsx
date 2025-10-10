@@ -1,5 +1,5 @@
 import { format } from 'date-fns';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Text, View } from 'react-native';
 
@@ -32,9 +32,9 @@ export function DailyBookingForm({
   const { t } = useTranslation();
   const [localData, setLocalData] = useState<DailyBookingData>(value);
 
-  useEffect(() => {
-    setLocalData(value);
-  }, [value]);
+  // useEffect(() => {
+  //   setLocalData(value);
+  // }, [value]);
 
   const handleDateRangeChange = (range: {
     startDate?: Date;

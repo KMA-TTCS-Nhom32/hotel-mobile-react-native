@@ -3,6 +3,8 @@
  * Types for payment method selection and booking creation
  */
 
+import { CreateBookingOnlineDtoPaymentMethodEnum } from '@ahomevilla-hotel/node-sdk';
+
 /**
  * Payment method types from backend
  */
@@ -24,7 +26,7 @@ export type PaymentCategory = 'PAY_AT_HOTEL' | 'ONLINE_CHECKOUT';
  */
 export interface PaymentOption {
   id: string;
-  method: PaymentMethod;
+  method: CreateBookingOnlineDtoPaymentMethodEnum;
   category: PaymentCategory;
   label: string;
   description?: string;

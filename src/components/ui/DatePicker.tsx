@@ -6,6 +6,7 @@ import { Calendar, type DateData } from 'react-native-calendars';
 
 import { HEX_COLORS } from '@/config/colors';
 import { useCommonTranslation } from '@/i18n/hooks';
+import { formatDateForCalendar, parseDateFromCalendar } from '@/utils/format';
 
 interface DatePickerProps {
   label: string;
@@ -35,7 +36,7 @@ export function DatePicker({
   const [isVisible, setIsVisible] = useState(false);
 
   const handleDateSelect = (date: DateData) => {
-    const selectedDate = new Date(date.year, date.month - 1, date.day);
+    const selectedDate = parseDateFromCalendar(date.dateString);
     onChange(selectedDate);
     setIsVisible(false);
   };
@@ -45,19 +46,19 @@ export function DatePicker({
   };
 
   const getMinDateString = () => {
-    if (minDate) return format(minDate, 'yyyy-MM-dd');
-    return format(new Date(), 'yyyy-MM-dd'); // Default to today
+    if (minDate) return formatDateForCalendar(minDate);
+    return formatDateForCalendar(new Date()); // Default to today
   };
 
   const getMaxDateString = () => {
-    if (maxDate) return format(maxDate, 'yyyy-MM-dd');
+    if (maxDate) return formatDateForCalendar(maxDate);
     return undefined;
   };
 
   const getMarkedDates = () => {
     const marked = { ...markedDates };
     if (value) {
-      const dateString = format(value, 'yyyy-MM-dd');
+      const dateString = formatDateForCalendar(value);
       marked[dateString] = {
         selected: true,
       };
@@ -128,7 +129,7 @@ export function DatePicker({
 
             {/* Calendar */}
             <Calendar
-              current={value ? format(value, 'yyyy-MM-dd') : undefined}
+              current={value ? formatDateForCalendar(value) : undefined}
               onDayPress={handleDateSelect}
               minDate={getMinDateString()}
               maxDate={getMaxDateString()}
