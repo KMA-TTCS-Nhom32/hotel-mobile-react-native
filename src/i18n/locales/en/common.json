@@ -168,5 +168,36 @@
     "selectDateRangePlaceholder": "Tap to select check-in and check-out dates",
     "dailyBookingInfo": "Daily Booking Details",
     "dailyBookingNote": "Check-in time: 2:00 PM, Check-out time: 12:00 PM. Minimum 1 day stay required."
+  },
+
+  "bookings": {
+    "myBookings": "My Bookings",
+    "manageYourReservations": "Manage your hotel reservations",
+    "noBookingsYet": "No Bookings Yet",
+    "noBookingsDesc": "You haven't made any hotel reservations. Start exploring amazing destinations and book your perfect stay!",
+    "exploreHotels": "Explore Hotels",
+    "noBookingsInFilter": "No bookings found with the selected filter",
+    "viewDetails": "View Details",
+    "cancel": "Cancel",
+    "bookingCode": "Booking Code",
+    "roomUnavailable": "Room Unavailable",
+    "branchUnavailable": "Branch Unavailable",
+    "filters": {
+      "all": "All",
+      "upcoming": "Upcoming",
+      "completed": "Completed",
+      "cancelled": "Cancelled"
+    }
+  },
+  "status": {
+    "confirmed": "Confirmed",
+    "pending": "Pending",
+    "cancelled": "Cancelled"
+  },
+  "loading": "Loading...",
+  "retry": "Try Again",
+  "errors": {
+    "failedToLoad": "Failed to load data",
+    "generic": "Something went wrong. Please try again later."
   }
 }
