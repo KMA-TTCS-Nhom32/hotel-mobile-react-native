@@ -21,10 +21,10 @@ export const emailValidation = (t: TFunction) =>
   z.email({ message: t('validation.email') });
 
 /**
- * phone number validation (simple regex for demonstration)
+ * phone number validation (adjusted for Vietnamese phone numbers)
  */
 export const phoneValidation = (t: TFunction) =>
-  z.string().regex(/^\+?[1-9]\d{1,14}$/, { message: t('validation.phone') });
+  z.string().regex(/^(0|\+84|84)?[1-9][0-9]{8,9}$/, { message: t('validation.phone') });
 
 /**
  * Phone or Email validation (union of phone and email)

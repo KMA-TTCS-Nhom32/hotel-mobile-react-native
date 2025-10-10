@@ -16,3 +16,8 @@ export function cancelBookingService(id: string, data: CancelBookingDto) {
     data
   );
 }
+
+// Thêm hàm mới để lấy danh sách đặt phòng của người dùng
+export function getMyBookingsService() {
+  return privateRequest.get<Booking[]>(ENDPOINTS.GET_MYBOOKING);
+}

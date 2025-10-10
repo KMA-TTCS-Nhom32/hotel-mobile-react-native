@@ -168,5 +168,37 @@
     "selectDateRangePlaceholder": "Nhấn để chọn ngày nhận và trả phòng",
     "dailyBookingInfo": "Thông tin đặt phòng theo ngày",
     "dailyBookingNote": "Giờ nhận phòng: 14:00, Giờ trả phòng: 12:00 trưa. Yêu cầu nghỉ tối thiểu 1 ngày."
+  },
+
+  "bookings": {
+    "myBookings": "Phòng đã đặt",
+    "manageYourReservations": "Quản lý các đặt phòng của bạn",
+    "noBookingsYet": "Chưa có phòng đặt",
+    "noBookingsDesc": "Bạn chưa đặt phòng khách sạn nào. Hãy khám phá các điểm đến tuyệt vời và đặt kỳ nghỉ hoàn hảo của bạn!",
+    "exploreHotels": "Khám phá khách sạn",
+    "noBookingsInFilter": "Không tìm thấy đặt phòng nào với bộ lọc đã chọn",
+    "viewDetails": "Xem chi tiết",
+    "cancel": "Hủy đặt phòng",
+    "bookingCode": "Mã đặt phòng",
+    "roomUnavailable": "Không có thông tin phòng",
+    "branchUnavailable": "Không có thông tin chi nhánh",
+    "filters": {
+      "all": "Tất cả",
+      "upcoming": "Sắp tới",
+      "completed": "Đã hoàn thành",
+      "cancelled": "Đã hủy"
+    }
+  },
+  "status": {
+    "confirmed": "Đã xác nhận",
+    "pending": "Đang chờ",
+    "cancelled": "Đã hủy"
+  },
+  "loading": "Đang tải...",
+  "retry": "Thử lại",
+  "errors": {
+    "failedToLoad": "Không thể tải dữ liệu",
+    "generic": "Đã xảy ra lỗi. Vui lòng thử lại sau."
   }
+  
 }
