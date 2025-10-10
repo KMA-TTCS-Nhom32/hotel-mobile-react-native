@@ -52,9 +52,13 @@ export const useCreatePaymentLink = (options?: UseCreatePaymentLinkOptions) => {
         buyerPhone: user?.phone,
         items: params.items,
       };
-
+      console.log('create payment request', requestData);
       const response = await paymentService.createPayment(requestData);
-      return response;
+
+      // Extract the nested data object from the response
+      // API returns: { code, data: {...payment details...}, desc, signature }
+      // We only need the data object for the payment screen
+      return response.data;
     },
     onSuccess: data => {
       options?.onSuccess?.(data);

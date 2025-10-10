@@ -60,7 +60,12 @@ export const ProvinceSection: React.FC<ProvinceSectionProps> = ({
     isLoading: branchesLoading,
     isError: branchesError,
     refetch: refetchBranches,
-  } = useBranchesByProvince(selectedProvinceSlug || '', 1, 10);
+  } = useBranchesByProvince(selectedProvinceSlug || '');
+
+  console.log(
+    'branchesData',
+    branchesData?.data.map(branch => branch.province.name)
+  );
 
   const provinces = useMemo(
     () => provincesData?.data || [],

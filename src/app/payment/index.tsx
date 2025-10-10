@@ -23,6 +23,7 @@ import {
   RoomBookingSummary,
 } from '@/components/payment';
 import { ErrorState, LoadingSpinner } from '@/components/ui';
+import { ROUTES } from '@/config/routes';
 import { useCreateBooking } from '@/hooks/useCreateBooking';
 import { useCreatePaymentLink } from '@/hooks/useCreatePaymentLink';
 import { useRoomDetail } from '@/hooks/useRoomDetail';
@@ -46,6 +47,8 @@ export default function PaymentScreen() {
     endTime: string;
     price: string;
   }>();
+
+  console.log('payment params', params);
 
   // Fetch room data using React Query (will use cached data from room detail screen)
   const { data: room, isLoading, isError } = useRoomDetail(params.roomId);
@@ -99,7 +102,7 @@ export default function PaymentScreen() {
             bookingCode: booking.code,
             amount: totalPrice,
             items: room
-              ? [{ name: room.name, quantity: 1, price: basePrice }]
+              ? [{ name: room.name, quantity: 1, price: basePrice / 100 }]
               : undefined,
           });
         } else {
@@ -127,9 +130,10 @@ export default function PaymentScreen() {
   const { mutate: createPaymentLink, isPending: isCreatingPaymentLink } =
     useCreatePaymentLink({
       onSuccess: paymentData => {
+        console.log('created payment: ', paymentData);
         // Navigate to QR confirmation screen with payment data
         router.push({
-          pathname: '/payment/qr-confirmation' as any,
+          pathname: ROUTES.PAYMENT.QR_CONFIRMATION,
           params: {
             qrCode: paymentData.qrCode,
             accountName: paymentData.accountName,
