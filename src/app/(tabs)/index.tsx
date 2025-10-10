@@ -9,6 +9,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { BranchCarousel } from '@/components/home/BranchCarousel';
 import { ProvinceSection } from '@/components/home/ProvinceSection';
 import { SearchBar } from '@/components/home/SearchBar';
+import { SearchModal } from '@/components/home/SearchModal';
 import { ROUTES } from '@/config/routes';
 import { useLatestBranches } from '@/hooks/useBranches';
 import { useCommonTranslation } from '@/i18n/hooks';
@@ -51,6 +52,8 @@ export default function HomeScreen() {
     // TODO: Navigate to search screen
   };
 
+  const [showSearchModal, setShowSearchModal] = useState(false);
+
   return (
     <SafeAreaView
       className={`flex-1 ${isSticky ? 'bg-background-secondary' : 'bg-primary-main'}`}
@@ -62,25 +65,32 @@ export default function HomeScreen() {
       {/* Sticky Search Bar */}
       {isSticky && (
         <View className='pt-safe absolute left-0 right-0 top-0 z-10 bg-background-secondary'>
-          <SearchBar onPress={handleSearchPress} isSticky />
+          <SearchBar onPress={() => setShowSearchModal(true)} />
+          <SearchModal
+            visible={showSearchModal}
+            onClose={() => setShowSearchModal(false)}
+          />
         </View>
       )}
 
       <Animated.ScrollView
-        onScroll={handleScroll}
-        scrollEventThrottle={16}
-        showsVerticalScrollIndicator={false}
-        // bounces={false}
-        // overScrollMode='never'
-        contentContainerStyle={{
-          paddingTop: isSticky ? 60 : 0,
-          flexGrow: 1,
-        }}
-      >
-        {/* Search Bar Section */}
-        <View className='bg-primary-main'>
-          <SearchBar onPress={handleSearchPress} />
-        </View>
+      onScroll={handleScroll}
+      scrollEventThrottle={16}
+      showsVerticalScrollIndicator={false}
+      contentContainerStyle={{
+        paddingTop: isSticky ? 60 : 0,
+        flexGrow: 1,
+      }}
+    >
+      {/* Search Bar Section */}
+      <View className='bg-primary-main'>
+        {/* <SearchBar onPress={handleSearchPress} /> */}
+        <SearchBar onPress={() => setShowSearchModal(true)} />
+        <SearchModal
+          visible={showSearchModal}
+          onClose={() => setShowSearchModal(false)}
+        />
+      </View>
 
         {/* Body Content with Rounded Top */}
         <View className='flex-1 rounded-t-3xl bg-background-secondary pt-4'>
