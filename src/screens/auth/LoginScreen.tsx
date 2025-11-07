@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Link } from 'expo-router';
+import { Link, useRouter } from 'expo-router';
 import { FormProvider, useForm } from 'react-hook-form';
 import {
   View,
@@ -13,6 +13,7 @@ import {
 
 import { InputText } from '@/components/forms';
 import { Button } from '@/components/ui';
+import { ROUTES } from '@/config/routes';
 import { useAuth } from '@/hooks/useAuth';
 import { useAuthTranslation } from '@/i18n/hooks';
 import { authService } from '@/services/auth/authService';
@@ -28,6 +29,7 @@ export const LoginScreen = () => {
   const { t } = useAuthTranslation();
   const { login, isLoggingIn } = useAuth();
   const { setUser } = useAuthStore();
+  const router = useRouter();
 
   // Create form with Zod validation
   const form = useForm<LoginFormData>({
@@ -52,6 +54,8 @@ export const LoginScreen = () => {
 
       // Show success message
       showSuccessToast(t('success.loginSuccess'), t('welcome'));
+
+      router.push(ROUTES.HOME);
 
       // Navigation will be handled by the ProtectedRoute wrapper
     } catch (error) {

@@ -1,3 +1,4 @@
+import { RoomDetail } from '@ahomevilla-hotel/node-sdk';
 import { useQuery } from '@tanstack/react-query';
 
 import { RoomService } from '@/services/rooms/roomService';
@@ -17,7 +18,7 @@ export const useRooms = (
   filters?: Record<string, any>,
   enabled: boolean = false
 ) => {
-  return useQuery<PaginationResult<any>, Error>({
+  return useQuery<PaginationResult<RoomDetail>, Error>({
     queryKey: ['rooms', 'list', page, pageSize, filters],
     queryFn: () => RoomService.getRooms(page, pageSize, filters),
     staleTime: 5 * 60 * 1000, // 5 minutes

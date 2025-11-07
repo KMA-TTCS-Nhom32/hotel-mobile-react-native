@@ -74,23 +74,23 @@ export default function HomeScreen() {
       )}
 
       <Animated.ScrollView
-      onScroll={handleScroll}
-      scrollEventThrottle={16}
-      showsVerticalScrollIndicator={false}
-      contentContainerStyle={{
-        paddingTop: isSticky ? 60 : 0,
-        flexGrow: 1,
-      }}
-    >
-      {/* Search Bar Section */}
-      <View className='bg-primary-main'>
-        {/* <SearchBar onPress={handleSearchPress} /> */}
-        <SearchBar onPress={() => setShowSearchModal(true)} />
-        <SearchModal
-          visible={showSearchModal}
-          onClose={() => setShowSearchModal(false)}
-        />
-      </View>
+        onScroll={handleScroll}
+        scrollEventThrottle={16}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{
+          paddingTop: isSticky ? 60 : 0,
+          flexGrow: 1,
+        }}
+      >
+        {/* Search Bar Section */}
+        <View className='bg-primary-main'>
+          {/* <SearchBar onPress={handleSearchPress} /> */}
+          <SearchBar onPress={() => setShowSearchModal(true)} />
+          <SearchModal
+            visible={showSearchModal}
+            onClose={() => setShowSearchModal(false)}
+          />
+        </View>
 
         {/* Body Content with Rounded Top */}
         <View className='flex-1 rounded-t-3xl bg-background-secondary pt-4'>

@@ -17,6 +17,8 @@ import {
   View,
   Alert,
   Linking,
+  AppState,
+  AppStateStatus,
 } from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
 import ViewShot from 'react-native-view-shot';
@@ -76,9 +78,13 @@ export default function QRConfirmationScreen() {
   const { t } = usePaymentTranslation();
   const socketRef = useRef<Socket | null>(null);
   const qrRef = useRef<ViewShot>(null);
+  const appState = useRef<AppStateStatus>(AppState.currentState);
+  const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const pingIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const [isPaymentProcessing, setIsPaymentProcessing] = useState(false);
   const [timeRemaining, setTimeRemaining] = useState(15 * 60); // 15 minutes in seconds
   const [isExpired, setIsExpired] = useState(false);
+  const [socketConnected, setSocketConnected] = useState(false);
 
   const params = useLocalSearchParams<{
     qrCode: string;
@@ -229,21 +235,71 @@ export default function QRConfirmationScreen() {
         return;
       }
 
-      // Connect to Socket.io server
+      // Connect to Socket.io server with improved config
       const socketUrl = ENV.API_URL.replace('/api', '');
       const socket = io(socketUrl, {
         extraHeaders: {
           authorization: token,
         },
+        transports: ['websocket', 'polling'], // Try websocket first, fallback to polling
+        reconnection: true, // Auto-reconnect
+        reconnectionAttempts: 10, // Try 10 times
+        reconnectionDelay: 1000, // Wait 1s between attempts
+        reconnectionDelayMax: 5000, // Max 5s between attempts
+        timeout: 20000, // 20s connection timeout
+        forceNew: false, // Reuse existing connection if available
       });
 
       socketRef.current = socket;
 
       // Listen for connection
       socket.on('connect', () => {
-        console.log('Socket connected:', socket.id);
+        console.log('✅ Socket connected:', socket.id);
+        setSocketConnected(true);
         // Join the order room to receive payment updates
         socket.emit('joinOrderRoom', params.orderCode);
+        console.log('📡 Joined order room:', params.orderCode);
+
+        // Start ping interval to keep connection alive
+        // Send a ping every 25 seconds to prevent timeout
+        if (pingIntervalRef.current) {
+          clearInterval(pingIntervalRef.current);
+        }
+        pingIntervalRef.current = setInterval(() => {
+          if (socket.connected) {
+            socket.emit('ping', { orderCode: params.orderCode });
+            console.log('💓 Sent ping to keep connection alive');
+          }
+        }, 25000); // 25 seconds
+      });
+
+      // Listen for disconnection
+      socket.on('disconnect', reason => {
+        console.log('❌ Socket disconnected:', reason);
+        setSocketConnected(false);
+        // Clear ping interval when disconnected
+        if (pingIntervalRef.current) {
+          clearInterval(pingIntervalRef.current);
+          pingIntervalRef.current = null;
+        }
+        // Auto-reconnect will handle this
+      });
+
+      // Listen for reconnection attempts
+      socket.on('reconnect_attempt', attemptNumber => {
+        console.log('🔄 Reconnection attempt:', attemptNumber);
+      });
+
+      // Listen for successful reconnection
+      socket.on('reconnect', attemptNumber => {
+        console.log('✅ Reconnected after', attemptNumber, 'attempts');
+        setSocketConnected(true);
+        // Rejoin the room after reconnection
+        socket.emit('joinOrderRoom', params.orderCode);
+        console.log(
+          '📡 Rejoined order room after reconnect:',
+          params.orderCode
+        );
       });
 
       // Listen for payment updates
@@ -293,13 +349,69 @@ export default function QRConfirmationScreen() {
 
     // Cleanup on unmount
     return () => {
+      console.log('🧹 Cleaning up socket connection...');
+      const reconnectTimeout = reconnectTimeoutRef.current;
+      const pingInterval = pingIntervalRef.current;
+
+      if (reconnectTimeout) {
+        clearTimeout(reconnectTimeout);
+      }
+      if (pingInterval) {
+        clearInterval(pingInterval);
+      }
       if (socketRef.current) {
         socketRef.current.emit('leaveOrderRoom', params.orderCode);
         socketRef.current.disconnect();
         socketRef.current = null;
       }
+      setSocketConnected(false);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [params.orderCode]);
+
+  // Handle app state changes (background/foreground)
+  useEffect(() => {
+    const subscription = AppState.addEventListener('change', nextAppState => {
+      console.log(
+        '📱 App state changed:',
+        appState.current,
+        '->',
+        nextAppState
+      );
+
+      // App came back to foreground
+      if (
+        appState.current.match(/inactive|background/) &&
+        nextAppState === 'active'
+      ) {
+        console.log(
+          '✅ App came to foreground - checking socket connection...'
+        );
+
+        // Check if socket is still connected
+        if (socketRef.current) {
+          if (!socketRef.current.connected) {
+            console.log('🔄 Socket disconnected, reconnecting...');
+            socketRef.current.connect();
+          } else {
+            console.log('✅ Socket still connected');
+            // Rejoin room to ensure we're still listening
+            socketRef.current.emit('joinOrderRoom', params.orderCode);
+            console.log('📡 Re-emitted joinOrderRoom for safety');
+          }
+        }
+      } else if (nextAppState === 'background') {
+        console.log('⚠️ App went to background - socket will stay connected');
+        // Socket.io will keep the connection alive in background
+        // No need to disconnect
+      }
+
+      appState.current = nextAppState;
+    });
+
+    return () => {
+      subscription.remove();
+    };
   }, [params.orderCode]);
 
   // Handle cancel payment
@@ -340,9 +452,26 @@ export default function QRConfirmationScreen() {
         <Pressable onPress={handleCancel} className='p-2'>
           <AntDesign name='left' size={24} color={HEX_COLORS.text.primary} />
         </Pressable>
-        <Text className='flex-1 text-center text-xl font-bold text-neutral-darkest'>
-          {t('scanToPay') || 'Scan to Pay'}
-        </Text>
+        <View className='flex-1 items-center'>
+          <Text className='text-xl font-bold text-neutral-darkest'>
+            {t('scanToPay') || 'Scan to Pay'}
+          </Text>
+          {/* Connection Status Indicator */}
+          <View className='mt-1 flex-row items-center gap-1'>
+            <View
+              className={`h-2 w-2 rounded-full ${
+                socketConnected ? 'bg-success-main' : 'bg-warning-main'
+              }`}
+            />
+            <Text
+              className={`text-xs ${
+                socketConnected ? 'text-success-dark' : 'text-warning-dark'
+              }`}
+            >
+              {socketConnected ? '🟢 Connected' : '🟡 Connecting...'}
+            </Text>
+          </View>
+        </View>
         <View className='w-8' />
       </View>
 
