@@ -8,7 +8,8 @@ export const ENDPOINTS = {
   VERIFY_EMAIL: '/auth/verify-email',
   CHANGE_PASSWORD: '/auth/change-password',
   INITIATE_EMAIL: '/auth/forgot-password/email/initiate',
-  VERIFY_CODE: '/verification/verify-email-otp',
+  VERIFY_EMAIL_OTP: '/verification/verify-email-otp',
+  // Note: Resend OTP uses the same registration endpoint
   RESET_PASSWORD: '/auth/forgot-password/email/reset',
   GET_USER: '/auth/profile',
   GET_MYBOOKING: '/booking/my-bookings',

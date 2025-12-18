@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import {
   View,
   Text,
@@ -9,18 +9,37 @@ import {
   ScrollView,
   TouchableOpacity,
   TextInput,
+  ActivityIndicator,
 } from 'react-native';
+import { useRouter, useLocalSearchParams } from 'expo-router';
 
 import { Button } from '@/components/ui';
+import { authService } from '@/services/auth/authService';
 
 /**
- * OTP Verification screen (UI only for now)
- * Will be connected to API in future
+ * OTP Verification screen with API integration
  */
 export const OTPVerificationScreen = () => {
+  const router = useRouter();
+  const params = useLocalSearchParams<{ email?: string; userId?: string }>();
+  const email = params.email || '';
+
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
+  const [isVerifying, setIsVerifying] = useState(false);
   const [isResending, setIsResending] = useState(false);
+  const [countdown, setCountdown] = useState(60);
+  const [canResend, setCanResend] = useState(false);
   const inputRefs = useRef<(TextInput | null)[]>([]);
+
+  // Countdown timer for resend
+  useEffect(() => {
+    if (countdown > 0) {
+      const timer = setTimeout(() => setCountdown(countdown - 1), 1000);
+      return () => clearTimeout(timer);
+    } else {
+      setCanResend(true);
+    }
+  }, [countdown]);
 
   const handleOtpChange = (raw: string, index: number) => {
     const digits = raw.replace(/\D/g, '');
@@ -51,22 +70,81 @@ export const OTPVerificationScreen = () => {
     }
   };
 
-  const handleVerifyOTP = () => {
+  const handleVerifyOTP = async () => {
     const otpCode = otp.join('');
     if (otpCode.length !== 6) {
       Alert.alert('Error', 'Please enter the complete 6-digit code');
       return;
     }
-    Alert.alert('Coming Soon', 'OTP verification will be implemented soon');
+
+    if (!email) {
+      Alert.alert('Error', 'Email is missing. Please go back and try again.');
+      return;
+    }
+
+    setIsVerifying(true);
+    try {
+      await authService.verifyEmailOTP(email, otpCode);
+
+      Alert.alert(
+        'Success!',
+        'Your account has been verified successfully. You can now login.',
+        [
+          {
+            text: 'OK',
+            onPress: () => router.replace('/auth/login'),
+          },
+        ]
+      );
+    } catch (error: any) {
+      console.error('OTP verification error:', error);
+
+      const errorMessage = error.message || 'Mã OTP không hợp lệ hoặc đã hết hạn';
+
+      Alert.alert(
+        'Xác thực thất bại',
+        errorMessage
+      );
+      // Clear OTP on error
+      setOtp(['', '', '', '', '', '']);
+      inputRefs.current[0]?.focus();
+    } finally {
+      setIsVerifying(false);
+    }
   };
 
-  const handleResendOTP = () => {
+  const handleResendOTP = async () => {
+    if (!canResend || !email) return;
+
     setIsResending(true);
-    // Simulate API call
-    setTimeout(() => {
+    try {
+      await authService.resendOTP(email);
+
+      Alert.alert('Success', 'Verification code has been resent to your email');
+
+      // Reset countdown
+      setCountdown(60);
+      setCanResend(false);
+
+      // Clear current OTP
+      setOtp(['', '', '', '', '', '']);
+      inputRefs.current[0]?.focus();
+    } catch (error: any) {
+      console.error('Resend OTP error:', error);
+
+      const errorMessage = error.message || 'Không thể gửi lại mã. Vui lòng thử lại sau.';
+
+      Alert.alert(
+        'Gửi lại thất bại',
+        errorMessage
+      );
+    } finally {
       setIsResending(false);
-      Alert.alert('Success', 'Verification code has been resent');
-    }, 2000);
+    }
+  };
+
+  const handleBackToRegister = () => {
+    router.back();
   };
 
   return (
@@ -88,17 +166,20 @@ export const OTPVerificationScreen = () => {
               resizeMode='contain'
             />
             <Text className='text-center text-lg font-medium text-orange-600'>
-              Verify Your Account
+              Xác Thực Tài Khoản
             </Text>
             <Text className='mt-2 text-center text-sm text-orange-500'>
-              Enter the 6-digit code sent to your email
+              Nhập mã 6 số đã gửi đến
+            </Text>
+            <Text className='mt-1 text-center text-sm font-semibold text-orange-700'>
+              {email}
             </Text>
           </View>
 
           {/* OTP Input Section */}
           <View className='mb-8'>
             <Text className='mb-6 text-center text-sm text-orange-700'>
-              Please enter the verification code
+              Vui lòng nhập mã xác thực
             </Text>
 
             {/* OTP Input Fields */}
@@ -115,7 +196,8 @@ export const OTPVerificationScreen = () => {
                     handleKeyPress(nativeEvent.key, index)
                   }
                   keyboardType='numeric'
-                  maxLength={1}
+                  maxLength={6}
+                  editable={!isVerifying && !isResending}
                   className='h-12 w-12 rounded-lg border-2 border-orange-200 bg-white text-center text-lg font-bold text-orange-800 focus:border-orange-400'
                 />
               ))}
@@ -124,15 +206,24 @@ export const OTPVerificationScreen = () => {
             {/* Resend Code */}
             <View className='items-center'>
               <Text className='text-sm text-orange-700'>
-                Didn&apos;t receive the code?
+                Không nhận được mã?
               </Text>
               <TouchableOpacity
                 onPress={handleResendOTP}
-                disabled={isResending}
+                disabled={!canResend || isResending || isVerifying}
                 className='mt-2'
               >
-                <Text className='text-sm font-semibold text-orange-600'>
-                  {isResending ? 'Resending...' : 'Resend Code'}
+                <Text
+                  className={`text-sm font-semibold ${canResend && !isResending && !isVerifying
+                    ? 'text-orange-600'
+                    : 'text-orange-300'
+                    }`}
+                >
+                  {isResending
+                    ? 'Resending...'
+                    : canResend
+                      ? 'Resend Code'
+                      : `Resend in ${countdown}s`}
                 </Text>
               </TouchableOpacity>
             </View>
@@ -140,18 +231,22 @@ export const OTPVerificationScreen = () => {
 
           {/* Verify Button */}
           <Button
-            title='Verify Account'
+            title={isVerifying ? 'Đang xác thực...' : 'Xác Thực Tài Khoản'}
             onPress={handleVerifyOTP}
             variant='primary'
             fullWidth
+            disabled={isVerifying || isResending}
             style={{ backgroundColor: '#f97316' }}
           />
 
           {/* Back Link */}
           <View className='mt-6 items-center'>
-            <TouchableOpacity>
+            <TouchableOpacity
+              onPress={handleBackToRegister}
+              disabled={isVerifying || isResending}
+            >
               <Text className='text-sm font-medium text-orange-600'>
-                Back to Registration
+                Quay lại Đăng ký
               </Text>
             </TouchableOpacity>
           </View>
