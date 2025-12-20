@@ -4,11 +4,15 @@ import { Pressable, Text, TouchableOpacity, View } from 'react-native';
 
 interface SearchBarProps {
   onPress?: () => void;
+  onDatesPress?: () => void;
+  onGuestsPress?: () => void;
   isSticky?: boolean;
 }
 
 export const SearchBar: React.FC<SearchBarProps> = ({
   onPress,
+  onDatesPress,
+  onGuestsPress,
   isSticky = false,
 }) => {
   return (
@@ -36,14 +40,20 @@ export const SearchBar: React.FC<SearchBarProps> = ({
 
       {!isSticky && (
         <View className='mt-3 flex-row items-center gap-2'>
-          <TouchableOpacity className='flex-1 flex-row items-center gap-2 rounded-lg border border-white/30 bg-white/20 px-3 py-2'>
+          <TouchableOpacity
+            onPress={onDatesPress}
+            className='flex-1 flex-row items-center gap-2 rounded-lg border border-white/30 bg-white/20 px-3 py-2'
+          >
             <Ionicons name='calendar-outline' size={16} color='white' />
             <Text className='flex-1 text-sm text-white'>
               Check-in · Check-out
             </Text>
           </TouchableOpacity>
 
-          <TouchableOpacity className='flex-row items-center gap-2 rounded-lg border border-white/30 bg-white/20 px-3 py-2'>
+          <TouchableOpacity
+            onPress={onGuestsPress}
+            className='flex-row items-center gap-2 rounded-lg border border-white/30 bg-white/20 px-3 py-2'
+          >
             <Ionicons name='people-outline' size={16} color='white' />
             <Text className='text-sm text-white'>Guests</Text>
           </TouchableOpacity>

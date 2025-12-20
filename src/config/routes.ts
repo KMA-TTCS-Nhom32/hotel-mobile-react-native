@@ -14,6 +14,7 @@ export const ROUTES = {
   },
   ROOMS: {
     DETAIL: (id: string) => `/rooms/${id}` as const,
+    FILTERED: '/filtered-rooms',
   },
   PAYMENT: {
     INDEX: '/payment',

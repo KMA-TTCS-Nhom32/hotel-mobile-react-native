@@ -1,20 +1,13 @@
-import { Branch, RoomDetail } from '@ahomevilla-hotel/node-sdk';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import {
-  Modal,
-  View,
-  Text,
-  TouchableOpacity,
-  TextInput,
-  FlatList,
-  ActivityIndicator,
-} from 'react-native';
+import { Modal, View, Text, TouchableOpacity, Pressable } from 'react-native';
 
-import { useBranches } from '@/hooks/useBranches';
-import { useRooms } from '@/hooks/useRooms';
+import { DateRangePickerModal } from './DateRangePickerModal';
+import { GuestsModal, type GuestCounts } from './GuestsModal';
+import { LocationPickerModal } from './LocationPickerModal';
 
-type SearchType = 'branch' | 'room';
+import { ROUTES } from '@/config/routes';
 
 interface SearchModalProps {
   visible: boolean;
@@ -25,221 +18,324 @@ export const SearchModal: React.FC<SearchModalProps> = ({
   visible,
   onClose,
 }) => {
-  const [searchType, setSearchType] = useState<SearchType>('branch');
-  const [keyword, setKeyword] = useState('');
-  const [hasSearched, setHasSearched] = useState(false);
+  const router = useRouter();
 
-  // Gọi API chỉ khi đã search và có keyword
-  const { data: branchData, isLoading: branchLoading } = useBranches(
-    1,
-    10,
-    hasSearched && keyword ? { keyword } : undefined
-  );
-  const { data: roomData, isLoading: roomLoading } = useRooms(
-    1,
-    10,
-    hasSearched && keyword ? { keyword } : undefined,
-    hasSearched && !!keyword
-  );
-  const isLoading = searchType === 'branch' ? branchLoading : roomLoading;
-  const data: Branch[] | RoomDetail[] =
-    searchType === 'branch' ? branchData?.data || [] : roomData?.data || [];
+  // State for location
+  const [location, setLocation] = useState<{
+    type: 'city' | 'branch';
+    id: string;
+    name: string;
+  } | null>(null);
+  const [showLocationPicker, setShowLocationPicker] = useState(false);
 
-  const handleSearch = () => {
-    if (keyword.trim()) setHasSearched(true);
+  // State for dates
+  const [checkInDate, setCheckInDate] = useState<Date>(new Date());
+  const [checkOutDate, setCheckOutDate] = useState<Date>(() => {
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    return tomorrow;
+  });
+  const [showDatePicker, setShowDatePicker] = useState(false);
+
+  // State for guests
+  const [guestCounts, setGuestCounts] = useState<GuestCounts>({
+    adults: 2,
+    children: 0,
+    toddlers: 0,
+    infants: 0,
+  });
+  const [showGuestsPicker, setShowGuestsPicker] = useState(false);
+
+  const formatDateRange = () => {
+    const formatDate = (date: Date) => {
+      const day = date.getDate();
+      const month = date.getMonth() + 1;
+      return `${day}/${month}`;
+    };
+
+    const diffTime = checkOutDate.getTime() - checkInDate.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    return `${formatDate(checkInDate)} - ${formatDate(checkOutDate)}, ${diffDays} đêm`;
   };
 
-  const renderItem = ({ item }: { item: Branch | RoomDetail }) => {
-    const isBranch = searchType === 'branch';
-    const branchItem = item as Branch;
-    const roomItem = item as RoomDetail;
+  const formatGuests = () => {
+    const totalChildren =
+      guestCounts.children + guestCounts.toddlers + guestCounts.infants;
+    if (totalChildren > 0) {
+      return `${guestCounts.adults} người lớn, ${totalChildren} trẻ em`;
+    }
+    return `${guestCounts.adults} người lớn`;
+  };
 
-    return (
-      <TouchableOpacity
-        style={{ padding: 12, borderBottomWidth: 1, borderColor: '#eee' }}
-      >
-        {isBranch ? (
-          <>
-            <Text style={{ fontWeight: 'bold', fontSize: 16 }}>
-              {branchItem.name}
-            </Text>
-            <Text style={{ color: '#64748b' }}>{branchItem.address}</Text>
-          </>
-        ) : (
-          <>
-            <Text style={{ fontWeight: 'bold', fontSize: 16 }}>
-              {roomItem.name}
-            </Text>
-            <Text style={{ color: '#64748b' }}>{roomItem.description}</Text>
-            <Text style={{ color: '#f97316' }}>
-              Giá:{' '}
-              {roomItem.base_price_per_hour ||
-                roomItem.base_price_per_night ||
-                roomItem.base_price_per_day}
-              ₫
-            </Text>
-          </>
-        )}
-      </TouchableOpacity>
-    );
+  const handleSearch = () => {
+    // Navigate to search results with filters
+    router.push({
+      pathname: '/search-results' as any,
+      params: {
+        locationId: location?.id || '',
+        locationType: location?.type || '',
+        locationName: location?.name || '',
+        checkIn: checkInDate.toISOString(),
+        checkOut: checkOutDate.toISOString(),
+        adults: guestCounts.adults.toString(),
+        children: guestCounts.children.toString(),
+        toddlers: guestCounts.toddlers.toString(),
+        infants: guestCounts.infants.toString(),
+      },
+    });
+    onClose();
+  };
+
+  const handleDateConfirm = (checkIn: Date, checkOut: Date) => {
+    setCheckInDate(checkIn);
+    setCheckOutDate(checkOut);
+  };
+
+  const handleGuestsConfirm = (counts: GuestCounts) => {
+    setGuestCounts(counts);
   };
 
   return (
-    <Modal
-      visible={visible}
-      animationType='slide'
-      transparent
-      onRequestClose={onClose}
-    >
-      <View
-        style={{
-          flex: 1,
-          backgroundColor: 'rgba(0,0,0,0.2)',
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}
+    <>
+      <Modal
+        visible={visible}
+        animationType='slide'
+        transparent
+        onRequestClose={onClose}
       >
-        <View
+        <Pressable
           style={{
-            width: '90%',
-            backgroundColor: 'white',
-            borderRadius: 16,
-            padding: 16,
-            shadowColor: '#000',
-            shadowOpacity: 0.1,
-            shadowRadius: 8,
-            elevation: 12,
+            flex: 1,
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
           }}
+          onPress={onClose}
         >
-          {/* Header */}
-          <View
+          <Pressable
             style={{
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              marginBottom: 16,
+              marginTop: 'auto',
+              backgroundColor: 'white',
+              borderTopLeftRadius: 24,
+              borderTopRightRadius: 24,
+              paddingHorizontal: 20,
+              paddingTop: 8,
+              paddingBottom: 32,
             }}
+            onPress={e => e.stopPropagation()}
           >
+            {/* Handle bar */}
+            <View
+              style={{
+                width: 40,
+                height: 4,
+                backgroundColor: '#cbd5e1',
+                borderRadius: 2,
+                alignSelf: 'center',
+                marginBottom: 16,
+              }}
+            />
+
+            {/* Destination Field */}
             <TouchableOpacity
+              onPress={() => setShowLocationPicker(true)}
               style={{
-                flex: 1,
-                backgroundColor: searchType === 'branch' ? '#f97316' : '#eee',
-                padding: 8,
-                borderRadius: 8,
-                marginRight: 4,
-              }}
-              onPress={() => {
-                setSearchType('branch');
-                setHasSearched(false);
-                setKeyword('');
-              }}
-            >
-              <Text
-                style={{
-                  color: searchType === 'branch' ? '#fff' : '#333',
-                  textAlign: 'center',
-                  fontWeight: 'bold',
-                }}
-              >
-                Chi nhánh
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={{
-                flex: 1,
-                backgroundColor: searchType === 'room' ? '#f97316' : '#eee',
-                padding: 8,
-                borderRadius: 8,
-                marginLeft: 4,
-              }}
-              onPress={() => {
-                setSearchType('room');
-                setHasSearched(false);
-                setKeyword('');
-              }}
-            >
-              <Text
-                style={{
-                  color: searchType === 'room' ? '#fff' : '#333',
-                  textAlign: 'center',
-                  fontWeight: 'bold',
-                }}
-              >
-                Phòng
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={onClose} style={{ marginLeft: 8 }}>
-              <Ionicons name='close' size={24} color='#64748b' />
-            </TouchableOpacity>
-          </View>
-          {/* Input keyword */}
-          <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              marginBottom: 8,
-            }}
-          >
-            <Ionicons name='search' size={20} color='#737373' />
-            <TextInput
-              style={{
-                flex: 1,
-                marginLeft: 8,
+                paddingVertical: 12,
                 borderBottomWidth: 1,
-                borderColor: '#eee',
-                fontSize: 16,
+                borderBottomColor: '#f1f5f9',
               }}
-              value={keyword}
-              onChangeText={setKeyword}
-              placeholder={
-                searchType === 'branch' ? 'Tìm chi nhánh...' : 'Tìm phòng...'
-              }
-              onSubmitEditing={handleSearch}
-              returnKeyType='search'
-            />
-            <TouchableOpacity onPress={handleSearch} disabled={!keyword.trim()}>
-              <Ionicons
-                name='arrow-forward-circle'
-                size={24}
-                color={keyword.trim() ? '#f97316' : '#ccc'}
-              />
-            </TouchableOpacity>
-          </View>
-          {/* Result */}
-          {isLoading && (
-            <ActivityIndicator
-              size='large'
-              color='#f97316'
-              style={{ marginTop: 16 }}
-            />
-          )}
-          {hasSearched && !isLoading && (
-            <FlatList
-              data={data}
-              renderItem={renderItem}
-              keyExtractor={item => item.id}
-              style={{ maxHeight: 300 }}
-              ListEmptyComponent={
+            >
+              <Text
+                style={{
+                  fontSize: 12,
+                  color: '#f97316',
+                  fontWeight: '600',
+                  marginBottom: 4,
+                }}
+              >
+                Điểm Đến
+              </Text>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                }}
+              >
                 <Text
                   style={{
-                    textAlign: 'center',
-                    marginTop: 16,
-                    color: '#64748b',
+                    fontSize: 16,
+                    color: location ? '#1e293b' : '#94a3b8',
+                    flex: 1,
+                  }}
+                  numberOfLines={1}
+                >
+                  {location?.name || 'Thành phố, Khách sạn, Điểm đến...'}
+                </Text>
+                {location && (
+                  <TouchableOpacity
+                    onPress={e => {
+                      e.stopPropagation();
+                      setLocation(null);
+                    }}
+                  >
+                    <Ionicons name='close-circle' size={20} color='#94a3b8' />
+                  </TouchableOpacity>
+                )}
+                <Ionicons
+                  name='chevron-forward'
+                  size={20}
+                  color='#94a3b8'
+                  style={{ marginLeft: 8 }}
+                />
+              </View>
+            </TouchableOpacity>
+
+            {/* Date Field */}
+            <TouchableOpacity
+              onPress={() => setShowDatePicker(true)}
+              style={{
+                paddingVertical: 12,
+                borderBottomWidth: 1,
+                borderBottomColor: '#f1f5f9',
+              }}
+            >
+              <Text
+                style={{
+                  fontSize: 12,
+                  color: '#f97316',
+                  fontWeight: '600',
+                  marginBottom: 4,
+                }}
+              >
+                Ngày
+              </Text>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                }}
+              >
+                <Text
+                  style={{
+                    fontSize: 16,
+                    color: '#1e293b',
                   }}
                 >
-                  Không có kết quả phù hợp
+                  {formatDateRange()}
                 </Text>
-              }
-            />
-          )}
-          {!hasSearched && (
-            <Text
-              style={{ textAlign: 'center', marginTop: 16, color: '#64748b' }}
+                <Ionicons name='chevron-forward' size={20} color='#94a3b8' />
+              </View>
+            </TouchableOpacity>
+
+            {/* Guests Field */}
+            <TouchableOpacity
+              onPress={() => setShowGuestsPicker(true)}
+              style={{
+                paddingVertical: 12,
+                marginBottom: 20,
+              }}
             >
-              Nhập từ khóa và bấm tìm kiếm
-            </Text>
-          )}
-        </View>
-      </View>
-    </Modal>
+              <Text
+                style={{
+                  fontSize: 12,
+                  color: '#f97316',
+                  fontWeight: '600',
+                  marginBottom: 4,
+                }}
+              >
+                Khách
+              </Text>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                }}
+              >
+                <Text
+                  style={{
+                    fontSize: 16,
+                    color: '#1e293b',
+                  }}
+                >
+                  {formatGuests()}
+                </Text>
+                <Ionicons name='chevron-forward' size={20} color='#94a3b8' />
+              </View>
+            </TouchableOpacity>
+
+            {/* Info Box */}
+            <View
+              style={{
+                backgroundColor: '#fff7ed',
+                borderRadius: 12,
+                padding: 16,
+                marginBottom: 20,
+              }}
+            >
+              <Text
+                style={{
+                  fontSize: 14,
+                  fontWeight: '600',
+                  color: '#f97316',
+                  marginBottom: 8,
+                }}
+              >
+                Đặt nhiều phòng?
+              </Text>
+              <Text style={{ fontSize: 14, color: '#92400e' }}>
+                Chỉ cần gọi <Text style={{ fontWeight: '600' }}>1900 3311</Text>{' '}
+                hoặc <Text style={{ fontWeight: '600' }}>email</Text>! Đã có
+                AHomeVilla lo.
+              </Text>
+            </View>
+
+            {/* Search Button */}
+            <TouchableOpacity
+              onPress={handleSearch}
+              style={{
+                backgroundColor: '#f97316',
+                borderRadius: 12,
+                paddingVertical: 16,
+                alignItems: 'center',
+              }}
+            >
+              <Text
+                style={{
+                  fontSize: 16,
+                  fontWeight: 'bold',
+                  color: 'white',
+                }}
+              >
+                Tìm kiếm
+              </Text>
+            </TouchableOpacity>
+          </Pressable>
+        </Pressable>
+      </Modal>
+
+      {/* Sub-modals */}
+      <LocationPickerModal
+        visible={showLocationPicker}
+        onClose={() => setShowLocationPicker(false)}
+        onSelect={setLocation}
+        selectedLocation={location || undefined}
+      />
+
+      <DateRangePickerModal
+        visible={showDatePicker}
+        onClose={() => setShowDatePicker(false)}
+        onConfirm={handleDateConfirm}
+        initialCheckIn={checkInDate}
+        initialCheckOut={checkOutDate}
+      />
+
+      <GuestsModal
+        visible={showGuestsPicker}
+        onClose={() => setShowGuestsPicker(false)}
+        onConfirm={handleGuestsConfirm}
+      />
+    </>
   );
 };
