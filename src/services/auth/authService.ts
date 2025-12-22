@@ -1,11 +1,15 @@
 import type {
+  InitiateForgotPasswordEmailDto,
   LoginDto,
   LoginResponseDto,
   RefreshTokenResponseDto,
   RegisterDto,
   RegisterResponseDto,
+  ResetPasswordWithOTPEmailDto,
+  ResponseWithMessage,
   UpdateProfileDto,
   User,
+  VerifyEmailDto,
 } from '@ahomevilla-hotel/node-sdk';
 
 import {
@@ -141,6 +145,57 @@ export class AuthService implements IAuthService {
       payload
     );
     return response.data;
+  };
+
+  /**
+   * Verify email with OTP code (after registration)
+   */
+  verifyEmail = async (
+    payload: VerifyEmailDto
+  ): Promise<ResponseWithMessage> => {
+    try {
+      const response = await publicRequest.post<ResponseWithMessage>(
+        ENDPOINTS.VERIFY_EMAIL,
+        payload
+      );
+      return response.data;
+    } catch (error) {
+      throw handleServiceError(error, 'Email verification failed');
+    }
+  };
+
+  /**
+   * Initiate forgot password - sends OTP to email
+   */
+  initiateForgotPassword = async (
+    payload: InitiateForgotPasswordEmailDto
+  ): Promise<ResponseWithMessage> => {
+    try {
+      const response = await publicRequest.post<ResponseWithMessage>(
+        ENDPOINTS.INITIATE_EMAIL,
+        payload
+      );
+      return response.data;
+    } catch (error) {
+      throw handleServiceError(error, 'Failed to send reset code');
+    }
+  };
+
+  /**
+   * Reset password using OTP
+   */
+  resetPasswordWithOTP = async (
+    payload: ResetPasswordWithOTPEmailDto
+  ): Promise<ResponseWithMessage> => {
+    try {
+      const response = await publicRequest.post<ResponseWithMessage>(
+        ENDPOINTS.RESET_PASSWORD,
+        payload
+      );
+      return response.data;
+    } catch (error) {
+      throw handleServiceError(error, 'Password reset failed');
+    }
   };
 }
 

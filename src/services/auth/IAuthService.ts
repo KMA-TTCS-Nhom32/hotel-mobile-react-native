@@ -1,11 +1,15 @@
 import type {
+  InitiateForgotPasswordEmailDto,
   LoginDto,
   LoginResponseDto,
   RefreshTokenResponseDto,
   RegisterDto,
   RegisterResponseDto,
+  ResetPasswordWithOTPEmailDto,
+  ResponseWithMessage,
   UpdateProfileDto,
   User,
+  VerifyEmailDto,
 } from '@ahomevilla-hotel/node-sdk';
 
 /**
@@ -48,4 +52,23 @@ export interface IAuthService {
   getProfile(): Promise<User>;
 
   updateProfile(payload: UpdateProfileDto): Promise<User>;
+
+  /**
+   * Verify email with OTP code (after registration)
+   */
+  verifyEmail(payload: VerifyEmailDto): Promise<ResponseWithMessage>;
+
+  /**
+   * Initiate forgot password - sends OTP to email
+   */
+  initiateForgotPassword(
+    payload: InitiateForgotPasswordEmailDto
+  ): Promise<ResponseWithMessage>;
+
+  /**
+   * Reset password using OTP
+   */
+  resetPasswordWithOTP(
+    payload: ResetPasswordWithOTPEmailDto
+  ): Promise<ResponseWithMessage>;
 }

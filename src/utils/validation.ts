@@ -68,3 +68,37 @@ export const createRegisterSchema = (t: TFunction) =>
     });
 
 export type RegisterFormData = z.infer<ReturnType<typeof createRegisterSchema>>;
+
+// OTP verification schema (register mode - OTP only)
+export const otpVerificationSchema = z.object({
+  otp: z.string().length(6, 'OTP must be 6 digits'),
+});
+
+export type OTPVerificationFormData = z.infer<typeof otpVerificationSchema>;
+
+// Forgot password schema (OTP + new password)
+export const createForgotPasswordSchema = (t: TFunction) =>
+  z
+    .object({
+      otp: z.string().length(6, t('form.otpInvalid')),
+      newPassword: z.string().min(6, t('form.passwordTooShort')),
+      confirmPassword: z.string().min(6, t('form.passwordTooShort')),
+    })
+    .refine(data => data.newPassword === data.confirmPassword, {
+      message: t('form.passwordsNotMatch'),
+      path: ['confirmPassword'],
+    });
+
+export type ForgotPasswordFormData = z.infer<
+  ReturnType<typeof createForgotPasswordSchema>
+>;
+
+// Email-only validation for forgot password initiation
+export const createForgotPasswordEmailSchema = (t: TFunction) =>
+  z.object({
+    email: z.string().email(t('validation.email')).min(1, t('form.required')),
+  });
+
+export type ForgotPasswordEmailFormData = z.infer<
+  ReturnType<typeof createForgotPasswordEmailSchema>
+>;
