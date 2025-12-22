@@ -1,90 +1,123 @@
+import type {
+  RegisterDto,
+  RegisterDtoAccountIdentifierEnum,
+} from '@ahomevilla-hotel/node-sdk';
+import { RegisterDtoAccountIdentifierEnum as AccountIdentifier } from '@ahomevilla-hotel/node-sdk';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { Link, useRouter } from 'expo-router';
 import { useState } from 'react';
+import { Controller, useForm } from 'react-hook-form';
 import {
-  View,
-  Text,
+  ActivityIndicator,
   Image,
-  Alert,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
+  Text,
   TouchableOpacity,
-  ActivityIndicator,
+  View,
 } from 'react-native';
 
 import { Button, Input } from '@/components/ui';
+import { useAuthTranslation } from '@/i18n/hooks';
 import { authService } from '@/services/auth/authService';
+import { getAuthErrorMessage } from '@/utils/errors';
+import { showErrorToast, showSuccessToast } from '@/utils/toast';
+import {
+  createRegisterSchema,
+  isValidEmail,
+  isValidPhone,
+  type RegisterFormData,
+} from '@/utils/validation';
 
 /**
- * Register screen with OTP integration
+ * Register screen with react-hook-form and Zod validation
+ * Supports both email and phone registration
  */
 export const RegisterScreen = () => {
   const router = useRouter();
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [email, setEmail] = useState('');
-  const [phone, setPhone] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  const { t } = useAuthTranslation();
+
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  const validateForm = (): string | null => {
-    if (!firstName.trim()) return 'First name is required';
-    if (!lastName.trim()) return 'Last name is required';
-    if (!email.trim()) return 'Email is required';
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<RegisterFormData>({
+    resolver: zodResolver(createRegisterSchema(t)),
+    defaultValues: {
+      name: '',
+      emailOrPhone: '',
+      password: '',
+      confirmPassword: '',
+    },
+  });
 
-    // Basic email validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) return 'Please enter a valid email';
+  // Determine registration type based on emailOrPhone input
+  const getRegistrationType = (
+    emailOrPhone: string
+  ): { type: RegisterDtoAccountIdentifierEnum; value: string } | null => {
+    const trimmedValue = emailOrPhone.trim();
 
-    if (!phone.trim()) return 'Phone number is required';
-    if (phone.length < 10) return 'Phone number must be at least 10 digits';
-
-    if (!password) return 'Password is required';
-    if (password.length < 6) return 'Password must be at least 6 characters';
-
-    if (password !== confirmPassword) return 'Passwords do not match';
+    // If contains '@', treat as email
+    if (trimmedValue.includes('@')) {
+      if (isValidEmail(trimmedValue)) {
+        return { type: AccountIdentifier.Email, value: trimmedValue };
+      }
+    } else {
+      // Otherwise treat as phone
+      if (isValidPhone(trimmedValue)) {
+        return { type: AccountIdentifier.Phone, value: trimmedValue };
+      }
+    }
 
     return null;
   };
 
-  const handleRegister = async () => {
-    // Validate form
-    const error = validateForm();
-    if (error) {
-      Alert.alert('Validation Error', error);
+  const onSubmit = async (data: RegisterFormData) => {
+    const identifierData = getRegistrationType(data.emailOrPhone);
+
+    if (!identifierData) {
+      showErrorToast(t('validation.phoneOrEmail'));
       return;
     }
 
     setIsLoading(true);
+
     try {
-      const response = await authService.register({
-        name: `${firstName} ${lastName}`,
-        email: email.trim().toLowerCase(),
-        phone: phone.trim(),
-        password,
-      });
-
-      // Navigate to OTP verification screen with email
-      router.push({
-        pathname: '/auth/otp-verification',
-        params: {
-          email: response.email || email.trim().toLowerCase(),
-          userId: response.id,
+      const payload: RegisterDto = {
+        accountIdentifier: identifierData.type,
+        data: {
+          name: data.name.trim(),
+          password: data.password,
+          ...(identifierData.type === AccountIdentifier.Email && {
+            email: identifierData.value,
+          }),
+          ...(identifierData.type === AccountIdentifier.Phone && {
+            phone: identifierData.value,
+          }),
         },
-      });
-    } catch (error: any) {
+      };
+
+      await authService.register(payload);
+
+      // Show success message
+      showSuccessToast(t('success.registerSuccess'));
+
+      // TODO: Navigate to OTP verification screen when implemented
+      // For now, redirect to login screen
+      // User will need to verify their email/phone before logging in
+      router.replace('/auth/login');
+    } catch (error) {
       console.error('Registration error:', error);
-
-      // Extract and display error message
-      const errorMessage = error.message || 'Không thể đăng ký. Vui lòng thử lại.';
-
-      Alert.alert(
-        'Đăng ký thất bại',
-        errorMessage
-      );
+      const errorMessage =
+        error instanceof Error
+          ? getAuthErrorMessage(error.message, t)
+          : t('errors.generic');
+      showErrorToast(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -109,85 +142,96 @@ export const RegisterScreen = () => {
               resizeMode='contain'
             />
             <Text className='text-center text-lg font-medium text-orange-600'>
-              Tạo Tài Khoản
+              {t('createAccount')}
             </Text>
             <Text className='mt-2 text-center text-sm text-orange-500'>
-              Tham gia AHome Villa ngay hôm nay
+              {t('welcomeSubtitle')}
             </Text>
           </View>
 
           {/* Register Form */}
           <View className='space-y-4'>
-            <View className='flex-row space-x-3'>
-              <View className='flex-1'>
-                <Text className='mb-2 text-sm font-medium text-orange-800'>
-                  Họ
-                </Text>
-                <Input
-                  value={firstName}
-                  onChangeText={setFirstName}
-                  placeholder='Nhập họ'
-                  editable={!isLoading}
-                  className='border-orange-200 bg-white focus:border-orange-400'
-                />
-              </View>
-              <View className='flex-1'>
-                <Text className='mb-2 text-sm font-medium text-orange-800'>
-                  Tên
-                </Text>
-                <Input
-                  value={lastName}
-                  onChangeText={setLastName}
-                  placeholder='Nhập tên'
-                  editable={!isLoading}
-                  className='border-orange-200 bg-white focus:border-orange-400'
-                />
-              </View>
-            </View>
-
+            {/* Full Name */}
             <View>
               <Text className='mb-2 text-sm font-medium text-orange-800'>
-                Địa chỉ Email
+                {t('form.firstName')} *
               </Text>
-              <Input
-                value={email}
-                onChangeText={setEmail}
-                placeholder='Nhập email của bạn'
-                keyboardType='email-address'
-                autoCapitalize='none'
-                autoComplete='email'
-                editable={!isLoading}
-                className='border-orange-200 bg-white focus:border-orange-400'
+              <Controller
+                control={control}
+                name='name'
+                render={({ field: { onChange, onBlur, value } }) => (
+                  <Input
+                    value={value}
+                    onChangeText={onChange}
+                    onBlur={onBlur}
+                    placeholder={t('form.firstName')}
+                    autoCapitalize='words'
+                    editable={!isLoading}
+                    className='border-orange-200 bg-white focus:border-orange-400'
+                  />
+                )}
               />
+              {errors.name && (
+                <Text className='mt-1 text-xs text-red-600'>
+                  {errors.name.message}
+                </Text>
+              )}
             </View>
 
+            {/* Email or Phone (Combined Field) */}
             <View>
               <Text className='mb-2 text-sm font-medium text-orange-800'>
-                Số Điện Thoại
+                {t('form.emailOrPhone')} *
               </Text>
-              <Input
-                value={phone}
-                onChangeText={setPhone}
-                placeholder='Nhập số điện thoại'
-                keyboardType='phone-pad'
-                autoComplete='tel'
-                editable={!isLoading}
-                className='border-orange-200 bg-white focus:border-orange-400'
+              <Controller
+                control={control}
+                name='emailOrPhone'
+                render={({ field: { onChange, onBlur, value } }) => (
+                  <Input
+                    value={value}
+                    onChangeText={onChange}
+                    onBlur={onBlur}
+                    placeholder={t('form.emailOrPhonePlaceholder')}
+                    keyboardType='default'
+                    autoCapitalize='none'
+                    autoComplete='username'
+                    editable={!isLoading}
+                    className='border-orange-200 bg-white focus:border-orange-400'
+                  />
+                )}
               />
+              {errors.emailOrPhone && (
+                <Text className='mt-1 text-xs text-red-600'>
+                  {errors.emailOrPhone.message}
+                </Text>
+              )}
+              {!errors.emailOrPhone && (
+                <Text className='mt-1 text-xs text-orange-600'>
+                  {t('validation.phoneOrEmailHint')}
+                </Text>
+              )}
             </View>
 
+            {/* Password */}
             <View>
               <Text className='mb-2 text-sm font-medium text-orange-800'>
-                Mật Khẩu
+                {t('form.password')} *
               </Text>
               <View className='relative'>
-                <Input
-                  value={password}
-                  onChangeText={setPassword}
-                  placeholder='Tạo mật khẩu'
-                  secureTextEntry={!showPassword}
-                  editable={!isLoading}
-                  className='border-orange-200 bg-white pr-12 focus:border-orange-400'
+                <Controller
+                  control={control}
+                  name='password'
+                  render={({ field: { onChange, onBlur, value } }) => (
+                    <Input
+                      value={value}
+                      onChangeText={onChange}
+                      onBlur={onBlur}
+                      placeholder={t('form.password')}
+                      secureTextEntry={!showPassword}
+                      editable={!isLoading}
+                      className='border-orange-200 bg-white pr-12 focus:border-orange-400'
+                    />
+                  )}
                 />
                 <TouchableOpacity
                   onPress={() => setShowPassword(!showPassword)}
@@ -195,24 +239,37 @@ export const RegisterScreen = () => {
                   className='absolute right-3 top-1/2 -translate-y-1/2'
                 >
                   <Text className='text-sm font-medium text-orange-600'>
-                    {showPassword ? 'Ẩn' : 'Hiện'}
+                    {showPassword ? t('hide') : t('show')}
                   </Text>
                 </TouchableOpacity>
               </View>
+              {errors.password && (
+                <Text className='mt-1 text-xs text-red-600'>
+                  {errors.password.message}
+                </Text>
+              )}
             </View>
 
+            {/* Confirm Password */}
             <View>
               <Text className='mb-2 text-sm font-medium text-orange-800'>
-                Xác Nhận Mật Khẩu
+                {t('form.confirmPassword')} *
               </Text>
               <View className='relative'>
-                <Input
-                  value={confirmPassword}
-                  onChangeText={setConfirmPassword}
-                  placeholder='Nhập lại mật khẩu'
-                  secureTextEntry={!showConfirmPassword}
-                  editable={!isLoading}
-                  className='border-orange-200 bg-white pr-12 focus:border-orange-400'
+                <Controller
+                  control={control}
+                  name='confirmPassword'
+                  render={({ field: { onChange, onBlur, value } }) => (
+                    <Input
+                      value={value}
+                      onChangeText={onChange}
+                      onBlur={onBlur}
+                      placeholder={t('form.confirmPassword')}
+                      secureTextEntry={!showConfirmPassword}
+                      editable={!isLoading}
+                      className='border-orange-200 bg-white pr-12 focus:border-orange-400'
+                    />
+                  )}
                 />
                 <TouchableOpacity
                   onPress={() => setShowConfirmPassword(!showConfirmPassword)}
@@ -220,21 +277,34 @@ export const RegisterScreen = () => {
                   className='absolute right-3 top-1/2 -translate-y-1/2'
                 >
                   <Text className='text-sm font-medium text-orange-600'>
-                    {showConfirmPassword ? 'Ẩn' : 'Hiện'}
+                    {showConfirmPassword ? t('hide') : t('show')}
                   </Text>
                 </TouchableOpacity>
               </View>
+              {errors.confirmPassword && (
+                <Text className='mt-1 text-xs text-red-600'>
+                  {errors.confirmPassword.message}
+                </Text>
+              )}
             </View>
 
             {/* Register Button */}
-            <View>
+            <View style={{ marginTop: 24 }}>
+              {isLoading && (
+                <View className='mb-2 flex-row items-center justify-center'>
+                  <ActivityIndicator size='small' color='#f97316' />
+                  <Text className='ml-2 text-sm text-orange-600'>
+                    {t('signingIn')}
+                  </Text>
+                </View>
+              )}
               <Button
-                title={isLoading ? 'Đang tạo tài khoản...' : 'Tạo Tài Khoản'}
-                onPress={handleRegister}
+                title={isLoading ? t('signingIn') : t('createAccount')}
+                onPress={handleSubmit(onSubmit)}
                 variant='primary'
                 fullWidth
                 disabled={isLoading}
-                style={{ marginTop: 24, backgroundColor: '#f97316' }}
+                style={{ backgroundColor: '#f97316' }}
               />
             </View>
           </View>
@@ -242,12 +312,12 @@ export const RegisterScreen = () => {
           {/* Login Link */}
           <View className='mt-6 flex-row items-center justify-center'>
             <Text className='text-sm text-orange-700'>
-              Đã có tài khoản?{' '}
+              {t('alreadyHaveAccount')}{' '}
             </Text>
             <Link href='/auth/login' asChild>
               <TouchableOpacity disabled={isLoading}>
                 <Text className='text-sm font-semibold text-orange-600'>
-                  Đăng Nhập
+                  {t('login')}
                 </Text>
               </TouchableOpacity>
             </Link>
