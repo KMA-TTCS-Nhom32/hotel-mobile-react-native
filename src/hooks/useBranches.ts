@@ -1,7 +1,7 @@
 import type { Branch } from '@ahomevilla-hotel/node-sdk';
 import { useQuery } from '@tanstack/react-query';
 
-import { branchService } from '@/services/branches';
+import { branchService } from '@/services/branches/branchService';
 import type { BranchFilters } from '@/types/filters';
 import type { PaginationResult } from '@/types/pagination';
 

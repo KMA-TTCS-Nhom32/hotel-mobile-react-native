@@ -60,6 +60,56 @@
     "failedToLoadProvinces": "Không thể tải tỉnh thành",
     "branchesIn": "Chi nhánh tại {{province}}"
   },
+  "search": {
+    "whereAreYouGoing": "Bạn muốn đến đâu?",
+    "searchPlaceholder": "Tìm điểm đến, khách sạn...",
+    "checkInCheckOut": "Nhận · Trả phòng",
+    "guests": "Khách",
+    "destination": "Điểm đến",
+    "allDestinations": "Tất cả địa điểm",
+    "dates": "Ngày",
+    "selectDate": "Chọn ngày",
+    "change": "THAY ĐỔI"
+  },
+  "guests": {
+    "title": "Khách",
+    "adults": "Người lớn",
+    "adultsDescription": "Từ 12 tuổi trở lên",
+    "children": "Thiếu nhi",
+    "childrenDescription": "Từ 6 đến 11 tuổi",
+    "infants": "Em bé",
+    "infantsDescription": "Dưới 6 tuổi",
+    "bookMultipleRooms": "Đặt nhiều phòng?",
+    "bookMultipleRoomsDescription": "Chỉ cần gọi {{phone}} hoặc email! Đã có AHomeVilla lo.",
+    "adultsCount": "{{count}} người lớn",
+    "adultsCount_other": "{{count}} người lớn",
+    "childrenCount": "{{count}} trẻ em",
+    "childrenCount_other": "{{count}} trẻ em"
+  },
+  "roomSearch": {
+    "title": "Phòng phù hợp",
+    "loading": "Đang tìm phòng phù hợp...",
+    "loadingMore": "Đang tải thêm phòng...",
+    "error": "Không thể tải danh sách phòng",
+    "foundRooms": "Tìm thấy {{count}} phòng phù hợp",
+    "foundRooms_other": "Tìm thấy {{count}} phòng phù hợp",
+    "scrollForMore": "(cuộn để xem thêm)",
+    "noRoomsFound": "Không tìm thấy phòng phù hợp",
+    "noRoomsMatchCriteria": "Không có phòng nào đáp ứng yêu cầu {{adults}} người lớn",
+    "noRoomsMatchCriteria_other": "Không có phòng nào đáp ứng yêu cầu {{adults}} người lớn",
+    "andChildren": " và {{count}} trẻ em",
+    "andChildren_other": " và {{count}} trẻ em",
+    "changeGuestCount": "Chọn lại số lượng khách",
+    "maxAdults": "Tối đa {{count}} người lớn",
+    "maxAdults_other": "Tối đa {{count}} người lớn",
+    "maxChildren": "{{count}} trẻ em",
+    "maxChildren_other": "{{count}} trẻ em",
+    "byHour": "Theo giờ",
+    "byNight": "Qua đêm",
+    "byDay": "Theo ngày",
+    "viewDetails": "Xem chi tiết",
+    "nights": "đêm"
+  },
   "branchDetail": {
     "loadingBranch": "Đang tải thông tin chi nhánh...",
     "failedToLoadBranch": "Không thể tải thông tin chi nhánh",
@@ -200,5 +250,4 @@
     "failedToLoad": "Không thể tải dữ liệu",
     "generic": "Đã xảy ra lỗi. Vui lòng thử lại sau."
   }
-  
 }

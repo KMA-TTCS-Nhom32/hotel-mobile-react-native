@@ -92,7 +92,6 @@ export default function HomeScreen() {
       params: {
         adults: guestCounts.adults.toString(),
         children: guestCounts.children.toString(),
-        toddlers: guestCounts.toddlers.toString(),
         infants: guestCounts.infants.toString(),
       },
     });

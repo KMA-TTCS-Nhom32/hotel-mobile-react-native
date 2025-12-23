@@ -2,6 +2,8 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import React, { useState } from 'react';
 import { Modal, View, Text, TouchableOpacity, ScrollView } from 'react-native';
 
+import { useCommonTranslation } from '@/i18n/hooks';
+
 interface GuestsModalProps {
   visible: boolean;
   onClose: () => void;
@@ -11,7 +13,6 @@ interface GuestsModalProps {
 interface GuestCounts {
   adults: number;
   children: number;
-  toddlers: number;
   infants: number;
 }
 
@@ -22,10 +23,10 @@ export const GuestsModal: React.FC<GuestsModalProps> = ({
   onClose,
   onConfirm,
 }) => {
+  const { t } = useCommonTranslation();
   const [guestCounts, setGuestCounts] = useState<GuestCounts>({
     adults: 2,
     children: 0,
-    toddlers: 0,
     infants: 0,
   });
 
@@ -36,22 +37,21 @@ export const GuestsModal: React.FC<GuestsModalProps> = ({
     }));
   };
 
-  // Tính tổng số trẻ em (thiếu nhi + trẻ nhỏ + em bé)
+  // Calculate total children (children + infants)
   const getTotalChildren = () => {
-    return guestCounts.children + guestCounts.toddlers + guestCounts.infants;
+    return guestCounts.children + guestCounts.infants;
   };
 
-  // Kiểm tra xem có thể tăng số lượng không
+  // Check if can increment count
   const canIncrement = (type: keyof GuestCounts) => {
     if (type === 'adults') {
       return guestCounts.adults < 4;
     }
-    // Đối với trẻ em, kiểm tra tổng số trẻ em
+    // For children, check total
     return getTotalChildren() < 2;
   };
 
   const handleConfirm = () => {
-    // Call onConfirm callback with guest counts
     onConfirm?.(guestCounts);
     onClose();
   };
@@ -207,7 +207,7 @@ export const GuestsModal: React.FC<GuestsModalProps> = ({
                 color: '#1e293b',
               }}
             >
-              Khách
+              {t('guests.title')}
             </Text>
             <TouchableOpacity onPress={onClose}>
               <Ionicons name='close' size={28} color='#64748b' />
@@ -217,8 +217,8 @@ export const GuestsModal: React.FC<GuestsModalProps> = ({
           {/* Guest counters */}
           <ScrollView showsVerticalScrollIndicator={false}>
             <GuestCounter
-              label='Người lớn'
-              description='Từ 12 tuổi trở lên'
+              label={t('guests.adults')}
+              description={t('guests.adultsDescription')}
               count={guestCounts.adults}
               onIncrement={() =>
                 updateGuestCount('adults', guestCounts.adults + 1)
@@ -229,8 +229,8 @@ export const GuestsModal: React.FC<GuestsModalProps> = ({
               disableIncrement={!canIncrement('adults')}
             />
             <GuestCounter
-              label='Thiếu nhi'
-              description='Từ 6 đến 11 tuổi'
+              label={t('guests.children')}
+              description={t('guests.childrenDescription')}
               count={guestCounts.children}
               onIncrement={() =>
                 updateGuestCount('children', guestCounts.children + 1)
@@ -241,20 +241,8 @@ export const GuestsModal: React.FC<GuestsModalProps> = ({
               disableIncrement={!canIncrement('children')}
             />
             <GuestCounter
-              label='Trẻ nhỏ'
-              description='Từ 3 đến 5 tuổi'
-              count={guestCounts.toddlers}
-              onIncrement={() =>
-                updateGuestCount('toddlers', guestCounts.toddlers + 1)
-              }
-              onDecrement={() =>
-                updateGuestCount('toddlers', guestCounts.toddlers - 1)
-              }
-              disableIncrement={!canIncrement('toddlers')}
-            />
-            <GuestCounter
-              label='Em bé'
-              description='Dưới 3 tuổi'
+              label={t('guests.infants')}
+              description={t('guests.infantsDescription')}
               count={guestCounts.infants}
               onIncrement={() =>
                 updateGuestCount('infants', guestCounts.infants + 1)
@@ -282,12 +270,12 @@ export const GuestsModal: React.FC<GuestsModalProps> = ({
                   marginBottom: 8,
                 }}
               >
-                Đặt nhiều phòng?
+                {t('guests.bookMultipleRooms')}
               </Text>
               <Text style={{ fontSize: 14, color: '#92400e' }}>
-                Chỉ cần gọi <Text style={{ fontWeight: '600' }}>1900 3311</Text>{' '}
-                hoặc <Text style={{ fontWeight: '600' }}>email</Text>! Đã có
-                AHomeVilla lo.
+                {t('guests.bookMultipleRoomsDescription', {
+                  phone: '1900 3311',
+                })}
               </Text>
             </View>
           </ScrollView>
@@ -310,7 +298,7 @@ export const GuestsModal: React.FC<GuestsModalProps> = ({
                 color: 'white',
               }}
             >
-              Xác nhận
+              {t('buttons.confirm')}
             </Text>
           </TouchableOpacity>
         </View>
