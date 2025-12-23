@@ -1,10 +1,10 @@
 import { zodResolver } from '@hookform/resolvers/zod';
+import { Image } from 'expo-image';
 import { Link, useRouter } from 'expo-router';
 import { FormProvider, useForm } from 'react-hook-form';
 import {
   View,
   Text,
-  Image,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -73,16 +73,17 @@ export const LoginScreen = () => {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
       <ScrollView
+        className='bg-primary-light'
         contentContainerStyle={{ flexGrow: 1 }}
         keyboardShouldPersistTaps='handled'
       >
-        <View className='flex-1 justify-center bg-primary-light px-6 py-12'>
+        <View className='flex-1 justify-center px-6 py-12'>
           {/* Logo Section */}
           <View className='mb-12 items-center'>
             <Image
               source={require('@/assets/logos/logo-large-light.png')}
               className='mb-4 h-16 w-64'
-              resizeMode='contain'
+              contentFit='contain'
             />
             <Text className='text-center text-lg font-medium text-orange-600'>
               {t('welcome')}

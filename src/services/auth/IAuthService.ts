@@ -1,15 +1,16 @@
 import type {
+  InitiateForgotPasswordEmailDto,
   LoginDto,
   LoginResponseDto,
   RefreshTokenResponseDto,
-  User,
-} from '@ahomevilla-hotel/node-sdk';
-
-import type {
-  CreateUserDto,
+  RegisterDto,
   RegisterResponseDto,
-} from '@/types/auth.types';
-import type { VerifyCodeResponseDto } from '@/types/verification.types';
+  ResetPasswordWithOTPEmailDto,
+  ResponseWithMessage,
+  UpdateProfileDto,
+  User,
+  VerifyEmailDto,
+} from '@ahomevilla-hotel/node-sdk';
 
 /**
  * Minimal authentication service interface
@@ -21,6 +22,8 @@ export interface IAuthService {
    * Returns access token, refresh token, and expiration
    */
   login(credentials: LoginDto): Promise<LoginResponseDto>;
+
+  register(payload: RegisterDto): Promise<RegisterResponseDto>;
 
   /**
    * Refresh access token using refresh token
@@ -46,43 +49,26 @@ export interface IAuthService {
    */
   clearSession(): Promise<void>;
 
-  /**
-   * Get current user profile
-   */
   getProfile(): Promise<User>;
 
-  /**
-   * Register new user with email
-   * Sends OTP to email for verification
-   */
-  register(data: CreateUserDto): Promise<RegisterResponseDto>;
+  updateProfile(payload: UpdateProfileDto): Promise<User>;
 
   /**
-   * Verify email OTP code
-   * Activates the user account
+   * Verify email with OTP code (after registration)
    */
-  verifyEmailOTP(email: string, code: string): Promise<VerifyCodeResponseDto>;
+  verifyEmail(payload: VerifyEmailDto): Promise<ResponseWithMessage>;
 
   /**
-   * Resend OTP to email
-   * Re-sends verification code
+   * Initiate forgot password - sends OTP to email
    */
-  resendOTP(email: string): Promise<void>;
+  initiateForgotPassword(
+    payload: InitiateForgotPasswordEmailDto
+  ): Promise<ResponseWithMessage>;
 
   /**
-   * Initiate forgot password process
-   * Sends OTP to email for password reset
-   */
-  initiateForgotPassword(email: string): Promise<void>;
-
-  /**
-   * Reset password with OTP
-   * Verifies OTP and updates password
+   * Reset password using OTP
    */
   resetPasswordWithOTP(
-    email: string,
-    code: string,
-    newPassword: string
-  ): Promise<void>;
+    payload: ResetPasswordWithOTPEmailDto
+  ): Promise<ResponseWithMessage>;
 }
-

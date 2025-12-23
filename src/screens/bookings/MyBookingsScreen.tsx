@@ -10,7 +10,6 @@ import {
   ActivityIndicator,
   RefreshControl,
   StyleSheet,
-  // Xóa import Alert nếu không sử dụng
   TextInput,
   Modal,
 } from 'react-native';
@@ -336,7 +335,7 @@ export const MyBookingsScreen = () => {
           style={styles.roomImage}
           contentFit='cover'
           transition={300}
-          onError={() => {
+          onError={e => {
             console.log('Image load error');
             console.log('Failed image URL:', imageUrl);
           }}
