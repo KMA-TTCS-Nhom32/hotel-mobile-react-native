@@ -1,4 +1,5 @@
 import type {
+  ChangePasswordDto,
   InitiateForgotPasswordEmailDto,
   LoginDto,
   LoginResponseDto,
@@ -52,6 +53,11 @@ export interface IAuthService {
   getProfile(): Promise<User>;
 
   updateProfile(payload: UpdateProfileDto): Promise<User>;
+
+  /**
+   * Change current user's password
+   */
+  changePassword(payload: ChangePasswordDto): Promise<ResponseWithMessage>;
 
   /**
    * Verify email with OTP code (after registration)

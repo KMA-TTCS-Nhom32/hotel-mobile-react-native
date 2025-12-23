@@ -1,4 +1,5 @@
 import type {
+  ChangePasswordDto,
   InitiateForgotPasswordEmailDto,
   LoginDto,
   LoginResponseDto,
@@ -145,6 +146,23 @@ export class AuthService implements IAuthService {
       payload
     );
     return response.data;
+  };
+
+  /**
+   * Change current user's password
+   */
+  changePassword = async (
+    payload: ChangePasswordDto
+  ): Promise<ResponseWithMessage> => {
+    try {
+      const response = await privateRequest.post<ResponseWithMessage>(
+        ENDPOINTS.CHANGE_PASSWORD,
+        payload
+      );
+      return response.data;
+    } catch (error) {
+      throw handleServiceError(error, 'Password change failed');
+    }
   };
 
   /**

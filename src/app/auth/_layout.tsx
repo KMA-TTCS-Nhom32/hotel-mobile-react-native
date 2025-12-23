@@ -3,9 +3,7 @@ import React from 'react';
 import { View } from 'react-native';
 
 import { LanguageSelectMenu } from '@/components/ui';
-
-// App theme color for navigation elements
-const THEME_TINT_COLOR = '#f97316'; // orange-500
+import { HEX_COLORS } from '@/config/colors';
 
 export default function AuthLayout() {
   return (
@@ -14,7 +12,7 @@ export default function AuthLayout() {
         headerShown: true,
         headerTitle: '',
         headerTransparent: true,
-        headerTintColor: THEME_TINT_COLOR,
+        headerTintColor: HEX_COLORS.primary.main,
         headerBackTitle: '',
         headerRight: () => (
           <View className='mr-4'>

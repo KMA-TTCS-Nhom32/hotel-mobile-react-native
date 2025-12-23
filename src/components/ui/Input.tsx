@@ -1,3 +1,4 @@
+import Ionicons from '@expo/vector-icons/Ionicons';
 import { clsx } from 'clsx';
 import React, { useState } from 'react';
 import {
@@ -84,9 +85,11 @@ export const Input: React.FC<InputProps> = ({
 
         {isPassword && (
           <TouchableOpacity onPress={togglePasswordVisibility} className='ml-3'>
-            <Text className='text-sm text-neutral-dark'>
-              {isPasswordVisible ? 'Hide' : 'Show'}
-            </Text>
+            <Ionicons
+              name={isPasswordVisible ? 'eye-off-outline' : 'eye-outline'}
+              size={20}
+              color='#64748b'
+            />
           </TouchableOpacity>
         )}
 

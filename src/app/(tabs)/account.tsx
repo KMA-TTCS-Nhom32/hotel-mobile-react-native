@@ -1,4 +1,5 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
+import { router } from 'expo-router';
 import React, { useState } from 'react';
 import {
   Alert,
@@ -14,6 +15,7 @@ import {
   LANGUAGE_OPTIONS,
   LanguageSelectionModal,
 } from '@/components/ui/LanguageSelectionModal';
+import { ROUTES } from '@/config/routes';
 import { useAuth } from '@/hooks/useAuth';
 import {
   useCommonTranslation,
@@ -85,7 +87,7 @@ export default function AccountScreen() {
             {/* Edit Button */}
             <TouchableOpacity
               className='h-10 w-10 items-center justify-center rounded-full bg-neutral-lighter'
-              onPress={() => console.log('Edit profile pressed')}
+              onPress={() => router.push(ROUTES.ACCOUNT.EDIT_PROFILE)}
             >
               <Ionicons name='pencil' size={18} color='#64748b' />
             </TouchableOpacity>

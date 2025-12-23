@@ -64,7 +64,7 @@ export default function HomeScreen() {
     } else {
       // If city selected, go to filtered rooms
       router.push({
-        pathname: '/filtered-rooms',
+        pathname: ROUTES.ROOMS.FILTERED,
         params: {
           locationType: location.type,
           locationId: location.id,
@@ -77,7 +77,7 @@ export default function HomeScreen() {
   const handleDateSelect = (checkIn: Date | null, checkOut: Date | null) => {
     // Navigate to filtered rooms with dates
     router.push({
-      pathname: '/filtered-rooms',
+      pathname: ROUTES.ROOMS.FILTERED,
       params: {
         checkInDate: checkIn ? checkIn.toISOString() : '',
         checkOutDate: checkOut ? checkOut.toISOString() : '',
@@ -88,7 +88,7 @@ export default function HomeScreen() {
   const handleGuestsConfirm = (guestCounts: GuestCounts) => {
     // Navigate to filtered rooms with guest counts
     router.push({
-      pathname: '/filtered-rooms',
+      pathname: ROUTES.ROOMS.FILTERED,
       params: {
         adults: guestCounts.adults.toString(),
         children: guestCounts.children.toString(),
