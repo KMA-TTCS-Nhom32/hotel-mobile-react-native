@@ -25,6 +25,7 @@ export const ENDPOINTS = {
 
   // Room-detail
   ROOM_DETAIL: '/room-details',
+  ROOM_DETAILS_INFINITE: '/room-details/infinite',
 
   // Booking
   BOOKING: '/booking',

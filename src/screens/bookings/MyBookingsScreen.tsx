@@ -26,6 +26,11 @@ interface ImageType {
   publicId?: string;
 }
 
+interface AmenityType {
+  id: string;
+  name: string;
+}
+
 interface RoomDetailType {
   area?: number;
   max_adults?: number;
@@ -33,7 +38,7 @@ interface RoomDetailType {
   bed_type?: string;
   description?: string;
   quantity?: number;
-  amenities?: any[];
+  amenities?: AmenityType[];
   thumbnail?: ImageType;
   images?: ImageType[];
 }
@@ -53,7 +58,12 @@ interface BookingType {
   id: string;
   _id?: string;
   code: string;
-  status: string;
+  status:
+    | 'PENDING'
+    | 'CONFIRMED'
+    | 'CANCELED'
+    | 'COMPLETED'
+    | 'WAITING_FOR_CHECK_IN';
   room?: RoomType;
   start_date: string;
   end_date: string;
@@ -200,7 +210,7 @@ export const MyBookingsScreen = () => {
       }
 
       return Math.round(diffMinutes / 60);
-    } catch (_) {
+    } catch {
       return 1;
     }
   };
@@ -208,7 +218,11 @@ export const MyBookingsScreen = () => {
   // Get status info
   const getStatusInfo = (
     status: string
-  ): { color: string; text: string; icon: string } => {
+  ): {
+    color: string;
+    text: string;
+    icon: keyof typeof MaterialIcons.glyphMap;
+  } => {
     switch (status) {
       case 'CONFIRMED':
         return { color: '#10B981', text: 'Đã xác nhận', icon: 'check-circle' };
@@ -322,7 +336,7 @@ export const MyBookingsScreen = () => {
           contentFit='cover'
           transition={300}
           onError={e => {
-            console.log('Image load error:', e.nativeEvent.error);
+            console.log('Image load error');
             console.log('Failed image URL:', imageUrl);
           }}
         />
@@ -379,7 +393,13 @@ export const MyBookingsScreen = () => {
           {/* Price */}
           <View style={styles.priceRow}>
             <Text style={styles.priceLabel}>Tổng tiền:</Text>
-            <Text style={styles.priceValue}>{formatCurrency(totalAmount)}</Text>
+            <Text style={styles.priceValue}>
+              {formatCurrency(
+                typeof totalAmount === 'number'
+                  ? totalAmount
+                  : parseFloat(totalAmount as string) || 0
+              )}
+            </Text>
           </View>
 
           {/* Action buttons */}

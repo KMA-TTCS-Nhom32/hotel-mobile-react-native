@@ -102,3 +102,34 @@ export const createForgotPasswordEmailSchema = (t: TFunction) =>
 export type ForgotPasswordEmailFormData = z.infer<
   ReturnType<typeof createForgotPasswordEmailSchema>
 >;
+
+// Update profile schema
+export const createUpdateProfileSchema = (t: TFunction) =>
+  z.object({
+    name: z.string().min(1, t('form.required')),
+    email: z.string().email(t('validation.email')).optional().or(z.literal('')),
+    phone: z.string().optional().or(z.literal('')),
+    gender: z.enum(['MALE', 'FEMALE']).optional(),
+    birth_date: z.string().optional().or(z.literal('')),
+  });
+
+export type UpdateProfileFormData = z.infer<
+  ReturnType<typeof createUpdateProfileSchema>
+>;
+
+// Change password schema
+export const createChangePasswordSchema = (t: TFunction) =>
+  z
+    .object({
+      currentPassword: z.string().min(6, t('form.passwordTooShort')),
+      newPassword: z.string().min(6, t('form.passwordTooShort')),
+      confirmPassword: z.string().min(6, t('form.passwordTooShort')),
+    })
+    .refine(data => data.newPassword === data.confirmPassword, {
+      message: t('form.passwordsNotMatch'),
+      path: ['confirmPassword'],
+    });
+
+export type ChangePasswordFormData = z.infer<
+  ReturnType<typeof createChangePasswordSchema>
+>;

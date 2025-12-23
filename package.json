@@ -30,7 +30,7 @@
     "up-sdk": "pnpm up @ahomevilla-hotel/node-sdk@latest"
   },
   "dependencies": {
-    "@ahomevilla-hotel/node-sdk": "2025.12.2-2.63347",
+    "@ahomevilla-hotel/node-sdk": "2025.12.2-3.103119",
     "@expo/vector-icons": "^15.0.2",
     "@gorhom/bottom-sheet": "^5.2.6",
     "@hookform/resolvers": "^5.2.1",
