@@ -39,6 +39,7 @@ interface OTPInputModalProps {
   email: string;
   /** Required for register mode - userId returned from registration API */
   userId?: string;
+  backButtonTitle?: string;
   onClose: () => void;
   onSuccess: () => void;
 }
@@ -48,6 +49,7 @@ export const OTPInputModal: React.FC<OTPInputModalProps> = ({
   mode,
   email,
   userId,
+  backButtonTitle,
   onClose,
   onSuccess,
 }) => {
@@ -233,7 +235,7 @@ export const OTPInputModal: React.FC<OTPInputModalProps> = ({
           <View className='flex-row items-center justify-between border-b border-neutral-200 px-4 py-4'>
             <TouchableOpacity onPress={onClose} disabled={isSubmitting}>
               <Text className='text-base text-orange-600'>
-                {t('backToLogin') || 'Cancel'}
+                {backButtonTitle || t('backToLogin') || 'Cancel'}
               </Text>
             </TouchableOpacity>
             <Text className='text-lg font-semibold text-neutral-900'>

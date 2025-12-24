@@ -19,85 +19,71 @@ import {
   publicRequest,
   TokenManager,
 } from '@/config/api';
-import { handleServiceError } from '@/utils/errors';
 
 import type { IAuthService } from './IAuthService';
 
 /**
- * Minimal authentication service implementation
- * Handles only login, refresh, and logout endpoints
+ * Authentication service implementation
+ * Errors are automatically transformed to AppError by axios interceptors
  */
 export class AuthService implements IAuthService {
   /**
-   * Login with email and password
+   * Login with email/phone and password
    */
   login = async (credentials: LoginDto): Promise<LoginResponseDto> => {
-    try {
-      const response = await publicRequest.post<LoginResponseDto>(
-        ENDPOINTS.LOGIN,
-        credentials
-      );
+    const response = await publicRequest.post<LoginResponseDto>(
+      ENDPOINTS.LOGIN,
+      credentials
+    );
 
-      // Store tokens using TokenManager
-      await TokenManager.setTokens(response.data);
+    // Store tokens using TokenManager
+    await TokenManager.setTokens(response.data);
 
-      return response.data;
-    } catch (error) {
-      throw handleServiceError(error, 'Login failed');
-    }
+    return response.data;
   };
 
+  /**
+   * Register a new user
+   */
   register = async (payload: RegisterDto): Promise<RegisterResponseDto> => {
-    const res = await publicRequest.post<RegisterResponseDto>(
+    const response = await publicRequest.post<RegisterResponseDto>(
       ENDPOINTS.REGISTER,
       payload
     );
-    return res.data;
+    return response.data;
   };
 
   /**
    * Refresh access token using refresh token
    */
   refreshToken = async (): Promise<RefreshTokenResponseDto> => {
-    try {
-      const refreshToken = await TokenManager.getRefreshToken();
+    const refreshToken = await TokenManager.getRefreshToken();
 
-      if (!refreshToken) {
-        throw new Error('No refresh token available');
-      }
-
-      const response = await privateRequest.post<RefreshTokenResponseDto>(
-        ENDPOINTS.REFRESH,
-        { refreshToken }
-      );
-
-      // Store new tokens
-      await TokenManager.setTokens(response.data);
-
-      return response.data;
-    } catch (error) {
-      try {
-        await this.clearSession();
-      } catch (error) {
-        console.error('Failed to clear session:', error);
-      }
-      throw handleServiceError(error, 'Token refresh failed');
+    if (!refreshToken) {
+      throw new Error('No refresh token available');
     }
+
+    const response = await privateRequest.post<RefreshTokenResponseDto>(
+      ENDPOINTS.REFRESH,
+      { refreshToken }
+    );
+
+    // Store new tokens
+    await TokenManager.setTokens(response.data);
+
+    return response.data;
   };
 
   /**
    * Logout user and clear session
-   * No response body, success/failure based on status code
    */
   logout = async (): Promise<void> => {
     try {
-      // Call logout endpoint (no response body expected)
       await privateRequest.post(ENDPOINTS.LOGOUT);
     } catch (error) {
       // Continue with local cleanup even if API call fails
       console.warn('Logout API call failed:', error);
     } finally {
-      // Always clear local session
       await this.clearSession();
     }
   };
@@ -106,12 +92,8 @@ export class AuthService implements IAuthService {
    * Get user profile information
    */
   getProfile = async (): Promise<User> => {
-    try {
-      const response = await privateRequest.get<User>(ENDPOINTS.PROFILE);
-      return response.data;
-    } catch (error) {
-      throw handleServiceError(error, 'Failed to fetch user profile');
-    }
+    const response = await privateRequest.get<User>(ENDPOINTS.PROFILE);
+    return response.data;
   };
 
   /**
@@ -133,13 +115,12 @@ export class AuthService implements IAuthService {
    * Clear local session data
    */
   clearSession = async (): Promise<void> => {
-    try {
-      await TokenManager.clearTokens();
-    } catch (error) {
-      throw handleServiceError(error, 'Failed to clear session');
-    }
+    await TokenManager.clearTokens();
   };
 
+  /**
+   * Update user profile
+   */
   updateProfile = async (payload: UpdateProfileDto): Promise<User> => {
     const response = await privateRequest.patch<User>(
       ENDPOINTS.PROFILE,
@@ -154,15 +135,11 @@ export class AuthService implements IAuthService {
   changePassword = async (
     payload: ChangePasswordDto
   ): Promise<ResponseWithMessage> => {
-    try {
-      const response = await privateRequest.post<ResponseWithMessage>(
-        ENDPOINTS.CHANGE_PASSWORD,
-        payload
-      );
-      return response.data;
-    } catch (error) {
-      throw handleServiceError(error, 'Password change failed');
-    }
+    const response = await privateRequest.post<ResponseWithMessage>(
+      ENDPOINTS.CHANGE_PASSWORD,
+      payload
+    );
+    return response.data;
   };
 
   /**
@@ -171,15 +148,11 @@ export class AuthService implements IAuthService {
   verifyEmail = async (
     payload: VerifyEmailDto
   ): Promise<ResponseWithMessage> => {
-    try {
-      const response = await publicRequest.post<ResponseWithMessage>(
-        ENDPOINTS.VERIFY_EMAIL,
-        payload
-      );
-      return response.data;
-    } catch (error) {
-      throw handleServiceError(error, 'Email verification failed');
-    }
+    const response = await publicRequest.post<ResponseWithMessage>(
+      ENDPOINTS.VERIFY_EMAIL,
+      payload
+    );
+    return response.data;
   };
 
   /**
@@ -188,15 +161,11 @@ export class AuthService implements IAuthService {
   initiateForgotPassword = async (
     payload: InitiateForgotPasswordEmailDto
   ): Promise<ResponseWithMessage> => {
-    try {
-      const response = await publicRequest.post<ResponseWithMessage>(
-        ENDPOINTS.INITIATE_EMAIL,
-        payload
-      );
-      return response.data;
-    } catch (error) {
-      throw handleServiceError(error, 'Failed to send reset code');
-    }
+    const response = await publicRequest.post<ResponseWithMessage>(
+      ENDPOINTS.INITIATE_EMAIL,
+      payload
+    );
+    return response.data;
   };
 
   /**
@@ -205,15 +174,11 @@ export class AuthService implements IAuthService {
   resetPasswordWithOTP = async (
     payload: ResetPasswordWithOTPEmailDto
   ): Promise<ResponseWithMessage> => {
-    try {
-      const response = await publicRequest.post<ResponseWithMessage>(
-        ENDPOINTS.RESET_PASSWORD,
-        payload
-      );
-      return response.data;
-    } catch (error) {
-      throw handleServiceError(error, 'Password reset failed');
-    }
+    const response = await publicRequest.post<ResponseWithMessage>(
+      ENDPOINTS.RESET_PASSWORD,
+      payload
+    );
+    return response.data;
   };
 }
 

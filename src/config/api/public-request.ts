@@ -1,7 +1,8 @@
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import i18n from 'i18next';
 
 import { ENV, IS_PRODUCTION } from '@/config';
+import { transformAxiosError } from '@/utils/errors';
 
 const publicRequest = axios.create({
   baseURL: ENV.API_URL,
@@ -23,6 +24,14 @@ publicRequest.interceptors.request.use(
   },
   error => {
     return Promise.reject(error);
+  }
+);
+
+// Response interceptor to transform errors to AppError
+publicRequest.interceptors.response.use(
+  response => response,
+  (error: AxiosError) => {
+    return Promise.reject(transformAxiosError(error));
   }
 );
 

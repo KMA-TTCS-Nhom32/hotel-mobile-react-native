@@ -54,7 +54,7 @@ export const showInfoToast = (message: string, title?: string) => {
  */
 export const showWarningToast = (message: string, title?: string) => {
   Toast.show({
-    type: 'info', // react-native-toast-message doesn't have 'warning' by default
+    type: 'warning',
     text1: title || 'Warning',
     text2: message,
     position: 'top',

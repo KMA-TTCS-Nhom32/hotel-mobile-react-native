@@ -1,7 +1,7 @@
 import type { RoomDetail } from '@ahomevilla-hotel/node-sdk';
 import { useQuery } from '@tanstack/react-query';
 
-import { RoomService } from '@/services/rooms/roomService';
+import { roomService } from '@/services/rooms/roomService';
 
 /**
  * Hook to fetch room detail by ID
@@ -15,7 +15,7 @@ export function useRoomDetail(roomId: string | undefined) {
       if (!roomId) {
         throw new Error('Room ID is required');
       }
-      return RoomService.getRoomDetail(roomId);
+      return roomService.getRoomDetail(roomId);
     },
     enabled: !!roomId,
     staleTime: 1000 * 60 * 10, // 10 minutes - room details don't change often

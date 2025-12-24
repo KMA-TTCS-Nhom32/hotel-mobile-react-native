@@ -105,12 +105,22 @@ export const Button: React.FC<ButtonProps> = ({
       {leftIcon && !loading && <View className='mr-2'>{leftIcon}</View>}
 
       {loading ? (
-        <ActivityIndicator
-          size='small'
-          color={
-            variant === 'primary' || variant === 'danger' ? 'white' : '#374151'
-          }
-        />
+        <View className='flex-row items-center gap-2'>
+          <ActivityIndicator
+            size='small'
+            color={
+              variant === 'primary' || variant === 'danger'
+                ? 'white'
+                : '#374151'
+            }
+          />
+          <Text
+            style={textStyle}
+            className={clsx(textVariants({ variant, size }))}
+          >
+            {title}
+          </Text>
+        </View>
       ) : (
         <>
           <Text

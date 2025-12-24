@@ -7,7 +7,7 @@ import { showLocation } from 'react-native-map-link';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { AmenitiesSection } from '@/components/branch-detail/AmenitiesSection';
-import { BookNowButton } from '@/components/branch-detail/BookNowButton';
+// import { BookNowButton } from '@/components/branch-detail/BookNowButton';
 import { BranchImageGallery } from '@/components/branch-detail/BranchImageGallery';
 import { BranchInfoSection } from '@/components/branch-detail/BranchInfoSection';
 import { LocationMapPreview } from '@/components/branch-detail/LocationMapPreview';
@@ -53,10 +53,10 @@ export default function BranchDetailScreen() {
     };
   };
 
-  const handleBookNow = () => {
-    // TODO: Navigate to booking screen with branch pre-selected
-    console.log('Book now clicked for branch:', branch?.id);
-  };
+  // const handleBookNow = () => {
+  //   // TODO: Navigate to booking screen with branch pre-selected
+  //   console.log('Book now clicked for branch:', branch?.id);
+  // };
 
   const handleContactPress = () => {
     if (branch?.phone) {
@@ -75,9 +75,9 @@ export default function BranchDetailScreen() {
           latitude: parseFloat(branch.location.latitude),
           longitude: parseFloat(branch.location.longitude),
           title: displayData.name.replace('AHomeVilla', 'M Village'),
-          googlePlaceId: branch.location.google_place_id
-            ? decodeURIComponent(branch.location.google_place_id)
-            : undefined,
+          // googlePlaceId: branch.location.google_place_id
+          //   ? decodeURIComponent(branch.location.google_place_id)
+          //   : undefined,
           dialogTitle: 'Open in Maps',
           dialogMessage: 'Choose your preferred map app',
           cancelText: 'Cancel',
@@ -190,15 +190,13 @@ export default function BranchDetailScreen() {
             <AmenitiesSection amenities={branch.amenities} />
           )}
 
-          {/* Available Rooms */}
-          {branch.rooms && branch.rooms.length > 0 && (
-            <RoomsSection rooms={branch.rooms} />
-          )}
-
           {/* Nearby Places */}
           {displayData.nearBy && displayData.nearBy.length > 0 && (
             <NearbyPlacesSection nearBy={displayData.nearBy} />
           )}
+
+          {/* Available Rooms */}
+          <RoomsSection branchId={branch.id} />
 
           {/* Bottom spacing for fixed button */}
           <View className='h-24' />
@@ -206,7 +204,7 @@ export default function BranchDetailScreen() {
       </ScrollView>
 
       {/* Fixed Book Now Button */}
-      <BookNowButton onPress={handleBookNow} />
+      {/* <BookNowButton onPress={handleBookNow} /> */}
     </Screen>
   );
 }

@@ -2,6 +2,7 @@ import type {
   FilterRoomDetailDto,
   RoomDetail,
   RoomDetailInfinitePaginationResultDto,
+  RoomDetailPaginationResultDto,
 } from '@ahomevilla-hotel/node-sdk';
 
 /**
@@ -23,4 +24,10 @@ export interface IRoomService {
     filters: FilterRoomDetailDto,
     page?: number
   ): Promise<RoomDetailInfinitePaginationResultDto>;
+
+  searchRoomsPagination(
+    page: number,
+    pageSize: number,
+    filters: FilterRoomDetailDto
+  ): Promise<RoomDetailPaginationResultDto>;
 }

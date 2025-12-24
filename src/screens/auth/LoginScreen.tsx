@@ -82,7 +82,7 @@ export const LoginScreen = () => {
           <View className='mb-12 items-center'>
             <Image
               source={require('@/assets/logos/logo-large-light.png')}
-              className='mb-4 h-16 w-64'
+              style={{ width: 256, height: 64, marginBottom: 16 }}
               contentFit='contain'
             />
             <Text className='text-center text-lg font-medium text-orange-600'>

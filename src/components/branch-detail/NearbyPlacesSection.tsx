@@ -22,24 +22,24 @@ export function NearbyPlacesSection({ nearBy }: NearbyPlacesSectionProps) {
       </Text>
 
       {nearBy.length > 0 ? (
-        <View className='gap-3'>
+        <View className='flex flex-wrap gap-3'>
           {nearBy.map(place => (
             <View
               key={`${place.name}-${place.distance}`}
-              className='flex-row items-start gap-3'
+              className='flex-row items-start gap-2'
             >
-              <View className='mt-1'>
+              <View className='mt-3'>
                 <MaterialIcons
                   name='place'
-                  size={20}
+                  size={24}
                   color={HEX_COLORS.primary.main}
                 />
               </View>
-              <View className='flex-1'>
-                <Text className='mb-1 text-sm font-medium text-text-primary'>
+              <View className='flex flex-col'>
+                <Text className='mb-1 text-lg font-medium text-text-primary'>
                   {place.name}
                 </Text>
-                <Text className='text-xs text-text-tertiary'>
+                <Text className='text-base text-text-tertiary'>
                   {place.distance}
                 </Text>
               </View>

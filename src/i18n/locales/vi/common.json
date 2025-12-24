@@ -44,7 +44,8 @@
     "continue": "Tiếp tục",
     "skip": "Bỏ qua",
     "done": "Hoàn thành",
-    "close": "Đóng"
+    "close": "Đóng",
+    "apply": "Áp dụng"
   },
   "home": {
     "latestBranches": "Chi Nhánh Mới Nhất",
@@ -151,7 +152,11 @@
       "DOUBLE": "Giường đôi",
       "QUEEN": "Giường Queen",
       "KING": "Giường King"
-    }
+    },
+    "bookingOptions": "Tùy Chọn Đặt Phòng",
+    "searchingRooms": "Đang tìm kiếm phòng trống...",
+    "noRoomsForFilter": "Không có phòng phù hợp với tùy chọn của bạn",
+    "tryDifferentOptions": "Thử thay đổi loại hình, ngày hoặc số khách"
   },
   "roomDetail": {
     "loadingRoom": "Đang tải thông tin phòng...",
@@ -175,6 +180,11 @@
     "dailyDescription": "Đặt phòng theo ngày với thời gian tối thiểu 1 ngày"
   },
   "booking": {
+    "today": "Hôm nay",
+    "tomorrow": "Ngày mai",
+    "hourly": "Theo giờ",
+    "nightly": "Qua đêm",
+    "daily": "Theo ngày",
     "selectDate": "Chọn Ngày",
     "selectCheckInDate": "Chọn Ngày Nhận Phòng",
     "selectCheckOutDate": "Chọn Ngày Trả Phòng",

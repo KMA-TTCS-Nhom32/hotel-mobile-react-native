@@ -9,7 +9,7 @@ import { Link, useRouter } from 'expo-router';
 import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import {
-  ActivityIndicator,
+  // ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -39,8 +39,8 @@ export const RegisterScreen = () => {
   const router = useRouter();
   const { t } = useAuthTranslation();
 
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  // const [showPassword, setShowPassword] = useState(false);
+  // const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [showOtpModal, setShowOtpModal] = useState(false);
   const [registeredEmail, setRegisteredEmail] = useState('');
@@ -160,7 +160,7 @@ export const RegisterScreen = () => {
             <View className='mb-8 items-center'>
               <Image
                 source={require('@/assets/logos/logo-dark.webp')}
-                className='mb-4 h-16 w-16'
+                style={{ width: 64, height: 64, marginBottom: 16 }}
                 contentFit='contain'
               />
               <Text className='text-center text-lg font-medium text-orange-600'>
@@ -245,17 +245,18 @@ export const RegisterScreen = () => {
                     name='password'
                     render={({ field: { onChange, onBlur, value } }) => (
                       <Input
+                        isPassword
                         value={value}
                         onChangeText={onChange}
                         onBlur={onBlur}
                         placeholder={t('form.password')}
-                        secureTextEntry={!showPassword}
+                        // secureTextEntry={!showPassword}
                         editable={!isLoading}
                         className='border-orange-200 bg-white pr-12 focus:border-orange-400'
                       />
                     )}
                   />
-                  <TouchableOpacity
+                  {/* <TouchableOpacity
                     onPress={() => setShowPassword(!showPassword)}
                     disabled={isLoading}
                     className='absolute right-3 top-1/2 -translate-y-1/2'
@@ -263,7 +264,7 @@ export const RegisterScreen = () => {
                     <Text className='text-sm font-medium text-orange-600'>
                       {showPassword ? t('hide') : t('show')}
                     </Text>
-                  </TouchableOpacity>
+                  </TouchableOpacity> */}
                 </View>
                 {errors.password && (
                   <Text className='mt-1 text-xs text-red-600'>
@@ -283,17 +284,18 @@ export const RegisterScreen = () => {
                     name='confirmPassword'
                     render={({ field: { onChange, onBlur, value } }) => (
                       <Input
+                        isPassword
                         value={value}
                         onChangeText={onChange}
                         onBlur={onBlur}
                         placeholder={t('form.confirmPassword')}
-                        secureTextEntry={!showConfirmPassword}
+                        // secureTextEntry={!showConfirmPassword}
                         editable={!isLoading}
                         className='border-orange-200 bg-white pr-12 focus:border-orange-400'
                       />
                     )}
                   />
-                  <TouchableOpacity
+                  {/* <TouchableOpacity
                     onPress={() => setShowConfirmPassword(!showConfirmPassword)}
                     disabled={isLoading}
                     className='absolute right-3 top-1/2 -translate-y-1/2'
@@ -301,7 +303,7 @@ export const RegisterScreen = () => {
                     <Text className='text-sm font-medium text-orange-600'>
                       {showConfirmPassword ? t('hide') : t('show')}
                     </Text>
-                  </TouchableOpacity>
+                  </TouchableOpacity> */}
                 </View>
                 {errors.confirmPassword && (
                   <Text className='mt-1 text-xs text-red-600'>
@@ -312,20 +314,21 @@ export const RegisterScreen = () => {
 
               {/* Register Button */}
               <View style={{ marginTop: 24 }}>
-                {isLoading && (
+                {/* {isLoading && (
                   <View className='mb-2 flex-row items-center justify-center'>
                     <ActivityIndicator size='small' color='#f97316' />
                     <Text className='ml-2 text-sm text-orange-600'>
                       {t('signingIn')}
                     </Text>
                   </View>
-                )}
+                )} */}
                 <Button
                   title={isLoading ? t('signingIn') : t('createAccount')}
                   onPress={handleSubmit(onSubmit)}
                   variant='primary'
                   fullWidth
-                  disabled={isLoading}
+                  // disabled={isLoading}
+                  loading={isLoading}
                   style={{ backgroundColor: '#f97316' }}
                 />
               </View>

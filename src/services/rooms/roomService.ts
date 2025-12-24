@@ -2,6 +2,7 @@ import type {
   FilterRoomDetailDto,
   RoomDetail,
   RoomDetailInfinitePaginationResultDto,
+  RoomDetailPaginationResultDto,
 } from '@ahomevilla-hotel/node-sdk';
 
 import { ENDPOINTS } from '@/config/api/endpoints';
@@ -20,7 +21,7 @@ export class RoomService implements IRoomService {
    */
   getRoomDetail = async (id: string): Promise<RoomDetail> => {
     const response = await publicRequest.get<RoomDetail>(
-      `${ENDPOINTS.ROOM_DETAIL}/${id}`
+      `${ENDPOINTS.ROOM_DETAILS}/${id}`
     );
     return response.data;
   };
@@ -46,6 +47,24 @@ export class RoomService implements IRoomService {
           },
         }
       );
+    return response.data;
+  };
+
+  searchRoomsPagination = async (
+    page: number = 1,
+    pageSize: number = 10,
+    filters: FilterRoomDetailDto
+  ): Promise<RoomDetailPaginationResultDto> => {
+    const response = await publicRequest.get<RoomDetailPaginationResultDto>(
+      ENDPOINTS.ROOM_DETAILS,
+      {
+        params: {
+          page,
+          pageSize,
+          filters: JSON.stringify(filters),
+        },
+      }
+    );
     return response.data;
   };
 }

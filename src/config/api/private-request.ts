@@ -7,6 +7,7 @@ import type { AxiosResponse } from 'axios';
 import i18n from 'i18next';
 
 import { ENV, IS_PRODUCTION } from '@/config';
+import { transformAxiosError } from '@/utils/errors';
 import { Storage } from '@/utils/storage';
 
 import { ENDPOINTS } from './endpoints';
@@ -213,7 +214,7 @@ privateRequest.interceptors.request.use(
   }
 );
 
-// Response interceptor to handle token refresh
+// Response interceptor to handle token refresh and transform errors
 privateRequest.interceptors.response.use(
   (response: AxiosResponse) => {
     return response;
@@ -238,17 +239,15 @@ privateRequest.interceptors.response.use(
       } catch (refreshError) {
         console.error('Token refresh failed:', refreshError);
 
-        // Redirect to login or emit logout event
+        // Clear tokens and reject with transformed error
         await TokenManager.clearTokens();
 
-        // You can emit an event here to notify the app to redirect to login
-        // EventEmitter.emit('auth:logout');
-
-        return Promise.reject(refreshError);
+        return Promise.reject(transformAxiosError(error));
       }
     }
 
-    return Promise.reject(error);
+    // Transform all errors to AppError
+    return Promise.reject(transformAxiosError(error));
   }
 );
 

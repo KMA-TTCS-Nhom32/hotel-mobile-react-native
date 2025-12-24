@@ -24,7 +24,7 @@ export const ENDPOINTS = {
   AMENITY: '/amenities',
 
   // Room-detail
-  ROOM_DETAIL: '/room-details',
+  ROOM_DETAILS: '/room-details',
   ROOM_DETAILS_INFINITE: '/room-details/infinite',
 
   // Booking

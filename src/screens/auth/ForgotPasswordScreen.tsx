@@ -50,8 +50,10 @@ export const ForgotPasswordScreen = () => {
     setIsLoading(true);
 
     try {
-      await authService.initiateForgotPassword({ email: data.email.trim() });
-
+      const response = await authService.initiateForgotPassword({
+        email: data.email.trim(),
+      });
+      console.log('Forgot password response:', response);
       // Store email for OTP modal
       setSubmittedEmail(data.email.trim());
 
@@ -96,7 +98,7 @@ export const ForgotPasswordScreen = () => {
             <View className='mb-8 items-center'>
               <Image
                 source={require('@/assets/logos/logo-dark.webp')}
-                className='mb-4 h-16 w-16'
+                style={{ width: 64, height: 64, marginBottom: 16 }}
                 contentFit='contain'
               />
               <Text className='text-center text-xl font-bold text-orange-600'>
@@ -181,6 +183,7 @@ export const ForgotPasswordScreen = () => {
         email={submittedEmail}
         onClose={handleOtpClose}
         onSuccess={handleOtpSuccess}
+        backButtonTitle={t('hide')}
       />
     </>
   );

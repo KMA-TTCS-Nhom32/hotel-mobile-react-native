@@ -1,5 +1,6 @@
 {
   "expo": {
+    "jsEngine": "hermes",
     "name": "hotel-mobile-app",
     "slug": "hotel-mobile-app",
     "version": "1.0.0",
@@ -18,8 +19,10 @@
           "bidv",
           "vpbank",
           "acb"
-        ]
-      }
+        ],
+        "ITSAppUsesNonExemptEncryption": false
+      },
+      "bundleIdentifier": "sondoannam202.ahomevilla"
     },
     "android": {
       "adaptiveIcon": {
@@ -44,10 +47,19 @@
           "resizeMode": "contain",
           "backgroundColor": "#ffffff"
         }
-      ]
+      ],
+      "expo-font",
+      "expo-localization",
+      "expo-web-browser"
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "c113464c-48c9-4ff1-b7e8-e04d7a020360"
+      }
     }
   }
 }

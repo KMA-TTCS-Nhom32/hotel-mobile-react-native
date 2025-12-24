@@ -1,27 +1,71 @@
 import type { Amenity, RoomDetail } from '@ahomevilla-hotel/node-sdk';
+import { FilterRoomDetailDtoBookingTypeEnum } from '@ahomevilla-hotel/node-sdk';
 import { MaterialIcons } from '@expo/vector-icons';
+import { useQuery } from '@tanstack/react-query';
 import { Image as ExpoImage } from 'expo-image';
 import { useRouter, type Href } from 'expo-router';
-import { Dimensions, Image, Pressable, Text, View } from 'react-native';
+import { useState } from 'react';
+import {
+  ActivityIndicator,
+  Dimensions,
+  Image,
+  Pressable,
+  Text,
+  View,
+} from 'react-native';
 
 import { HEX_COLORS } from '@/config/colors';
 import { ROUTES } from '@/config/routes';
 import { useCommonTranslation, useLanguage } from '@/i18n/hooks';
+import { roomService } from '@/services/rooms/roomService';
+import { type BookingFilters, getDefaultBookingFilters } from '@/types/booking';
+import { formatDateForAPI } from '@/utils/format';
+
+import { BookingFilterBar } from './BookingFilterBar';
+import { BookingFilterModal } from './BookingFilterModal';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const CARD_WIDTH = SCREEN_WIDTH - 32;
 
 interface RoomsSectionProps {
-  rooms: RoomDetail[];
+  branchId: string;
 }
 
 /**
- * Available rooms section with pricing and details
+ * Available rooms section with dynamic filtering
+ * Fetches rooms based on booking options (type, dates, guests)
  */
-export function RoomsSection({ rooms }: RoomsSectionProps) {
+export function RoomsSection({ branchId }: RoomsSectionProps) {
   const router = useRouter();
   const { t } = useCommonTranslation();
   const { currentLanguage } = useLanguage();
+
+  // Filter state
+  const [filters, setFilters] = useState<BookingFilters>(
+    getDefaultBookingFilters
+  );
+  const [showFilterModal, setShowFilterModal] = useState(false);
+
+  // Fetch rooms based on filters
+  const { data, isLoading, isError } = useQuery({
+    queryKey: ['rooms', 'branch', branchId, filters],
+    queryFn: () =>
+      roomService.searchRoomsPagination(1, 10, {
+        branchId,
+        bookingType: filters.bookingType as FilterRoomDetailDtoBookingTypeEnum,
+        startDate: formatDateForAPI(filters.startDate),
+        endDate: formatDateForAPI(filters.endDate),
+        startTime: filters.startTime,
+        endTime: filters.endTime,
+        adults: filters.adults,
+        children: filters.children + filters.infants,
+      }),
+    staleTime: 1000 * 60 * 5, // 5 minutes
+  });
+
+  const rooms = data?.data || [];
+  // display logs in breaking lines
+  // console.log('rooms', JSON.stringify(rooms, null, 2));
 
   const getRoomDisplayData = (room: RoomDetail) => {
     const translation = room.translations?.find(
@@ -54,20 +98,49 @@ export function RoomsSection({ rooms }: RoomsSectionProps) {
     router.push(ROUTES.ROOMS.DETAIL(room.id) as Href);
   };
 
+  const handleFiltersChange = (newFilters: BookingFilters) => {
+    setFilters(newFilters);
+  };
+
   return (
     <View className='border-t border-neutral-light px-4 py-6'>
       <View className='mb-4 flex-row items-center justify-between'>
         <Text className='text-xl font-bold text-text-primary'>
           {t('branchDetail.availableRooms')}
         </Text>
-        <Text className='text-sm text-primary-main'>
-          {t('branchDetail.viewAllRooms')}
-        </Text>
       </View>
 
-      {rooms.length > 0 ? (
+      {/* Filter Bar */}
+      <BookingFilterBar
+        filters={filters}
+        onPress={() => setShowFilterModal(true)}
+      />
+
+      {/* Content */}
+      {isLoading ? (
+        <View className='items-center justify-center py-12'>
+          <ActivityIndicator size='large' color={HEX_COLORS.primary.main} />
+          <Text className='mt-3 text-sm text-text-secondary'>
+            {t('branchDetail.searchingRooms')}
+          </Text>
+        </View>
+      ) : isError ? (
+        <View className='items-center justify-center py-8'>
+          <MaterialIcons
+            name='error-outline'
+            size={40}
+            color={HEX_COLORS.error.main}
+          />
+          <Text className='mt-2 text-center text-sm text-text-secondary'>
+            {t('roomSearch.error')}
+          </Text>
+        </View>
+      ) : rooms.length > 0 ? (
         <View className='gap-4'>
-          {rooms.slice(0, 3).map(room => {
+          <Text className='text-sm text-text-secondary'>
+            {t('roomSearch.foundRooms', { count: rooms.length })}
+          </Text>
+          {rooms.slice(0, 5).map(room => {
             const displayData = getRoomDisplayData(room);
             const lowestPrice = getLowestPrice(room);
 
@@ -193,10 +266,28 @@ export function RoomsSection({ rooms }: RoomsSectionProps) {
           })}
         </View>
       ) : (
-        <Text className='text-sm text-text-tertiary'>
-          {t('branchDetail.noRoomsAvailable')}
-        </Text>
+        <View className='items-center justify-center py-8'>
+          <MaterialIcons
+            name='search-off'
+            size={48}
+            color={HEX_COLORS.text.secondary}
+          />
+          <Text className='mt-3 text-center text-base font-medium text-text-primary'>
+            {t('branchDetail.noRoomsForFilter')}
+          </Text>
+          <Text className='mt-1 text-center text-sm text-text-secondary'>
+            {t('branchDetail.tryDifferentOptions')}
+          </Text>
+        </View>
       )}
+
+      {/* Filter Modal */}
+      <BookingFilterModal
+        visible={showFilterModal}
+        initialFilters={filters}
+        onClose={() => setShowFilterModal(false)}
+        onApply={handleFiltersChange}
+      />
     </View>
   );
 }
