@@ -169,7 +169,9 @@
     "selectDatesFirst": "Vui lòng chọn ngày đặt phòng trước",
     "roomNotAvailable": "Phòng này hiện không có sẵn",
     "capacity": "Sức chứa",
-    "maxGuests": "Tối đa {{adults}} người lớn, {{children}} trẻ em"
+    "maxGuests": "Tối đa {{adults}} người lớn, {{children}} trẻ em",
+    "priceOverview": "Bảng Giá",
+    "bookNow": "Đặt Ngay"
   },
   "bookingType": {
     "hourly": "Theo Giờ",

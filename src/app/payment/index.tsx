@@ -8,9 +8,9 @@ import {
   CreateBookingOnlineDtoPaymentMethodEnum,
   CreateBookingOnlineDtoTypeEnum,
 } from '@ahomevilla-hotel/node-sdk/dist/models/create-booking-online-dto';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import React from 'react';
+import React, { useMemo } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { Pressable, ScrollView, Text, View } from 'react-native';
 
@@ -28,35 +28,78 @@ import { useCreateBooking } from '@/hooks/useCreateBooking';
 import { useCreatePaymentLink } from '@/hooks/useCreatePaymentLink';
 import { useRoomDetail } from '@/hooks/useRoomDetail';
 import { usePaymentTranslation } from '@/i18n/hooks';
+import { useBookingStore } from '@/store/bookingStore';
 import type { GuestCount } from '@/types/payment';
-import { formatCurrency } from '@/utils/format';
+import { formatCurrency, formatDateForAPI } from '@/utils/format';
 import { showErrorToast } from '@/utils/toast';
+
+/**
+ * Calculate total price based on booking type and room prices
+ */
+function calculateTotalPrice(
+  room: {
+    base_price_per_hour: string | number;
+    base_price_per_night: string | number;
+    base_price_per_day: string | number;
+    special_price_per_hour?: string | number;
+    special_price_per_night?: string | number;
+    special_price_per_day?: string | number;
+  },
+  bookingType: string,
+  startDate: Date,
+  endDate: Date,
+  startTime: string,
+  endTime: string
+): number {
+  if (bookingType === 'HOURLY') {
+    const [startHour] = startTime.split(':').map(Number);
+    const [endHour] = endTime.split(':').map(Number);
+    const duration = endHour - startHour;
+    const pricePerHour = Number(
+      room.special_price_per_hour || room.base_price_per_hour
+    );
+    return pricePerHour * duration;
+  }
+
+  if (bookingType === 'NIGHTLY') {
+    return Number(room.special_price_per_night || room.base_price_per_night);
+  }
+
+  if (bookingType === 'DAILY') {
+    const days = Math.ceil(
+      (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)
+    );
+    const pricePerDay = Number(
+      room.special_price_per_day || room.base_price_per_day
+    );
+    return pricePerDay * days;
+  }
+
+  return 0;
+}
 
 export default function PaymentScreen() {
   const router = useRouter();
   const { t } = usePaymentTranslation();
 
-  const params = useLocalSearchParams<{
-    // Room ID - will fetch from React Query cache
-    roomId: string;
-    // Booking details
-    bookingType: CreateBookingOnlineDtoTypeEnum;
-    startDate: string;
-    endDate: string;
-    startTime: string;
-    endTime: string;
-    price: string;
-  }>();
+  // Get booking state from store
+  const { filters, selectedRoom, clearBooking } = useBookingStore();
 
-  console.log('payment params', params);
+  // Fetch room data if not in store (fallback)
+  const {
+    data: fetchedRoom,
+    isLoading,
+    // isError,
+  } = useRoomDetail(selectedRoom?.id);
 
-  // Fetch room data using React Query (will use cached data from room detail screen)
-  const { data: room, isLoading, isError } = useRoomDetail(params.roomId);
+  // Use room from store or fetched
+  const room = selectedRoom || fetchedRoom;
 
+  // Initialize guests from filters
   const [guests, setGuests] = React.useState<GuestCount>({
-    adults: 2,
-    children: 0,
-    infants: 0,
+    adults: filters.adults,
+    children: filters.children,
+    infants: filters.infants,
   });
 
   const [selectedPaymentMethod, setSelectedPaymentMethod] =
@@ -73,9 +116,32 @@ export default function PaymentScreen() {
     },
   });
 
-  const basePrice = parseFloat(params.price || '0');
+  // Calculate price from store data
+  const basePrice = useMemo(() => {
+    if (!room) return 0;
+    return calculateTotalPrice(
+      room,
+      filters.bookingType,
+      filters.startDate,
+      filters.endDate,
+      filters.startTime,
+      filters.endTime
+    );
+  }, [room, filters]);
+
   const discount = 0; // TODO: Calculate discount based on promotion code
   const totalPrice = basePrice - discount;
+
+  // Format dates for API
+  const startDateFormatted = formatDateForAPI(filters.startDate);
+  const endDateFormatted = formatDateForAPI(filters.endDate);
+
+  // Format dates for display
+  const formatDisplayDate = (date: Date) => {
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    return `${day}/${month}`;
+  };
 
   // Booking creation mutation
   const { mutate: createBooking, isPending: isCreatingBooking } =
@@ -85,6 +151,8 @@ export default function PaymentScreen() {
         if (
           selectedPaymentMethod === CreateBookingOnlineDtoPaymentMethodEnum.Cash
         ) {
+          // Clear booking state
+          clearBooking();
           // For CASH payment, navigate directly to success screen
           router.push({
             pathname: '/payment/success' as any,
@@ -107,6 +175,7 @@ export default function PaymentScreen() {
           });
         } else {
           // Fallback for other payment methods
+          clearBooking();
           router.push({
             pathname: '/payment/success' as any,
             params: {
@@ -159,12 +228,12 @@ export default function PaymentScreen() {
     if (!room) return;
 
     const bookingData: CreateBookingOnlineDto = {
-      type: params.bookingType,
+      type: filters.bookingType as CreateBookingOnlineDtoTypeEnum,
       detailId: room.id,
-      start_date: params.startDate,
-      end_date: params.endDate,
-      start_time: params.startTime,
-      end_time: params.endTime,
+      start_date: startDateFormatted,
+      end_date: endDateFormatted,
+      start_time: filters.startTime,
+      end_time: filters.endTime,
       number_of_guests: guests.adults,
       adults: guests.adults,
       children: guests.children,
@@ -182,7 +251,7 @@ export default function PaymentScreen() {
   const isProcessing = isCreatingBooking || isCreatingPaymentLink;
 
   // Show loading state while fetching room data
-  if (isLoading) {
+  if (isLoading && !room) {
     return (
       <Screen backgroundColor='#f9fafb' safeArea={false} padding={false}>
         <StatusBar style='dark' />
@@ -193,8 +262,8 @@ export default function PaymentScreen() {
     );
   }
 
-  // Show error state if room data fetch fails
-  if (isError || !room) {
+  // Show error state if no room data
+  if (!room) {
     return (
       <Screen backgroundColor='#f9fafb' safeArea={false} padding={false}>
         <StatusBar style='dark' />
@@ -222,14 +291,14 @@ export default function PaymentScreen() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ padding: 16, paddingBottom: 100 }}
       >
-        {/* Room Summary */}
+        {/* Room Summary - Use store data */}
         <RoomBookingSummary
           room={room}
-          checkInDate={params.startDate}
-          checkInTime={params.startTime}
-          checkOutDate={params.endDate}
-          checkOutTime={params.endTime}
-          bookingType={params.bookingType}
+          checkInDate={formatDisplayDate(filters.startDate)}
+          checkInTime={filters.startTime}
+          checkOutDate={formatDisplayDate(filters.endDate)}
+          checkOutTime={filters.endTime}
+          bookingType={filters.bookingType as CreateBookingOnlineDtoTypeEnum}
           price={formatCurrency(basePrice)}
         />
 

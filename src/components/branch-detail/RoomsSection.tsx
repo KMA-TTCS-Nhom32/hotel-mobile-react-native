@@ -3,8 +3,8 @@ import { FilterRoomDetailDtoBookingTypeEnum } from '@ahomevilla-hotel/node-sdk';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useQuery } from '@tanstack/react-query';
 import { Image as ExpoImage } from 'expo-image';
-import { useRouter, type Href } from 'expo-router';
-import { useState } from 'react';
+import { useRouter } from 'expo-router';
+import { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   Dimensions,
@@ -15,10 +15,10 @@ import {
 } from 'react-native';
 
 import { HEX_COLORS } from '@/config/colors';
-import { ROUTES } from '@/config/routes';
 import { useCommonTranslation, useLanguage } from '@/i18n/hooks';
 import { roomService } from '@/services/rooms/roomService';
-import { type BookingFilters, getDefaultBookingFilters } from '@/types/booking';
+import { useBookingStore } from '@/store/bookingStore';
+import type { BookingFilters } from '@/types/booking';
 import { formatDateForAPI } from '@/utils/format';
 
 import { BookingFilterBar } from './BookingFilterBar';
@@ -40,11 +40,15 @@ export function RoomsSection({ branchId }: RoomsSectionProps) {
   const { t } = useCommonTranslation();
   const { currentLanguage } = useLanguage();
 
-  // Filter state
-  const [filters, setFilters] = useState<BookingFilters>(
-    getDefaultBookingFilters
-  );
+  // Use booking store
+  const { filters, setFilters, setSelectedRoom, setBranchId } =
+    useBookingStore();
   const [showFilterModal, setShowFilterModal] = useState(false);
+
+  // Set branch ID in store on mount
+  useEffect(() => {
+    setBranchId(branchId);
+  }, [branchId, setBranchId]);
 
   // Fetch rooms based on filters
   const { data, isLoading, isError } = useQuery({
@@ -95,7 +99,9 @@ export function RoomsSection({ branchId }: RoomsSectionProps) {
   };
 
   const handleRoomPress = (room: RoomDetail) => {
-    router.push(ROUTES.ROOMS.DETAIL(room.id) as Href);
+    // Store selected room and navigate
+    setSelectedRoom(room);
+    router.push(`/rooms/${room.id}`);
   };
 
   const handleFiltersChange = (newFilters: BookingFilters) => {

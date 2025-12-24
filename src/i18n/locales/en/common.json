@@ -169,7 +169,9 @@
     "selectDatesFirst": "Please select booking dates first",
     "roomNotAvailable": "This room is currently not available",
     "capacity": "Capacity",
-    "maxGuests": "Up to {{adults}} adults, {{children}} children"
+    "maxGuests": "Up to {{adults}} adults, {{children}} children",
+    "priceOverview": "Price Overview",
+    "bookNow": "Book Now"
   },
   "bookingType": {
     "hourly": "By Hours",

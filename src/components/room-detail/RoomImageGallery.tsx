@@ -14,7 +14,7 @@ import {
 import { ImageGalleryModal } from '@/components/ui';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
-const IMAGE_HEIGHT = 300;
+const IMAGE_HEIGHT = 350;
 
 interface RoomImageGalleryProps {
   thumbnail: ImageType;

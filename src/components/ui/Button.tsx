@@ -72,6 +72,7 @@ interface ButtonProps extends VariantProps<typeof buttonVariants> {
   textStyle?: TextStyle;
   leftIcon?: React.ReactNode;
   rightIcon?: React.ReactNode;
+  className?: string;
 }
 
 export const Button: React.FC<ButtonProps> = ({
@@ -86,6 +87,7 @@ export const Button: React.FC<ButtonProps> = ({
   textStyle,
   leftIcon,
   rightIcon,
+  className,
 }) => {
   const isDisabled = disabled || loading;
 
@@ -99,7 +101,7 @@ export const Button: React.FC<ButtonProps> = ({
           opacity: isDisabled ? 0.6 : 1,
         },
       ]}
-      className={clsx(buttonVariants({ variant, size, fullWidth }))}
+      className={clsx(buttonVariants({ variant, size, fullWidth }), className)}
       activeOpacity={0.8}
     >
       {leftIcon && !loading && <View className='mr-2'>{leftIcon}</View>}
