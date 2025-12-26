@@ -1,17 +1,38 @@
+import * as SecureStore from 'expo-secure-store';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Platform } from 'react-native';
 
 /**
- * Utility class for AsyncStorage operations with error handling
+ * Checks if SecureStore is available (native iOS/Android only)
+ * Falls back to AsyncStorage on web
+ */
+const isSecureStoreAvailable = Platform.OS !== 'web';
+
+/**
+ * Utility class for storage operations with encryption support
+ *
+ * Uses SecureStore (encrypted) for sensitive data on iOS/Android
+ * Falls back to AsyncStorage on web
+ *
+ * SecureStore benefits:
+ * - iOS: Uses Keychain Services (hardware-backed encryption)
+ * - Android: Uses Android Keystore (hardware-backed encryption)
  */
 export class Storage {
   /**
-   * Store a value in AsyncStorage
+   * Store a value securely
+   * Uses SecureStore on native, AsyncStorage on web
    */
   static async setItem(key: string, value: any): Promise<boolean> {
     try {
       const stringValue =
         typeof value === 'string' ? value : JSON.stringify(value);
-      await AsyncStorage.setItem(key, stringValue);
+
+      if (isSecureStoreAvailable) {
+        await SecureStore.setItemAsync(key, stringValue);
+      } else {
+        await AsyncStorage.setItem(key, stringValue);
+      }
       return true;
     } catch (error) {
       console.error(`Failed to store ${key}:`, error);
@@ -20,14 +41,21 @@ export class Storage {
   }
 
   /**
-   * Get a value from AsyncStorage
+   * Get a value from secure storage
    */
   static async getItem<T = string>(
     key: string,
     defaultValue?: T
   ): Promise<T | null> {
     try {
-      const value = await AsyncStorage.getItem(key);
+      let value: string | null;
+
+      if (isSecureStoreAvailable) {
+        value = await SecureStore.getItemAsync(key);
+      } else {
+        value = await AsyncStorage.getItem(key);
+      }
+
       if (value === null) return defaultValue || null;
 
       // Try to parse as JSON, fallback to string
@@ -43,11 +71,15 @@ export class Storage {
   }
 
   /**
-   * Remove a value from AsyncStorage
+   * Remove a value from secure storage
    */
   static async removeItem(key: string): Promise<boolean> {
     try {
-      await AsyncStorage.removeItem(key);
+      if (isSecureStoreAvailable) {
+        await SecureStore.deleteItemAsync(key);
+      } else {
+        await AsyncStorage.removeItem(key);
+      }
       return true;
     } catch (error) {
       console.error(`Failed to remove ${key}:`, error);
@@ -56,11 +88,16 @@ export class Storage {
   }
 
   /**
-   * Remove multiple values from AsyncStorage
+   * Remove multiple values from storage
    */
   static async removeItems(keys: string[]): Promise<boolean> {
     try {
-      await AsyncStorage.multiRemove(keys);
+      if (isSecureStoreAvailable) {
+        // SecureStore doesn't have multiRemove, do it one by one
+        await Promise.all(keys.map(key => SecureStore.deleteItemAsync(key)));
+      } else {
+        await AsyncStorage.multiRemove(keys);
+      }
       return true;
     } catch (error) {
       console.error(`Failed to remove keys:`, keys, error);
@@ -69,20 +106,22 @@ export class Storage {
   }
 
   /**
-   * Clear all AsyncStorage data
+   * Clear all storage data
+   * Note: On native, this only clears AsyncStorage, not SecureStore
+   * For security reasons, SecureStore items must be deleted individually
    */
   static async clear(): Promise<boolean> {
     try {
       await AsyncStorage.clear();
       return true;
     } catch (error) {
-      console.error('Failed to clear AsyncStorage:', error);
+      console.error('Failed to clear storage:', error);
       return false;
     }
   }
 
   /**
-   * Get all keys from AsyncStorage
+   * Get all keys from AsyncStorage (not available for SecureStore)
    */
   static async getAllKeys(): Promise<readonly string[]> {
     try {
@@ -94,11 +133,18 @@ export class Storage {
   }
 
   /**
-   * Check if a key exists in AsyncStorage
+   * Check if a key exists in storage
    */
   static async hasItem(key: string): Promise<boolean> {
     try {
-      const value = await AsyncStorage.getItem(key);
+      let value: string | null;
+
+      if (isSecureStoreAvailable) {
+        value = await SecureStore.getItemAsync(key);
+      } else {
+        value = await AsyncStorage.getItem(key);
+      }
+
       return value !== null;
     } catch (error) {
       console.error(`Failed to check if ${key} exists:`, error);
