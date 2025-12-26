@@ -18,6 +18,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useAuthTranslation } from '@/i18n/hooks';
 import { authService } from '@/services/auth/authService';
 import { useAuthStore } from '@/store/authStore';
+import { getAuthErrorMessage } from '@/utils/errors';
 import { showErrorToast, showSuccessToast } from '@/utils/toast';
 import { createLoginSchema, LoginFormData } from '@/utils/validation';
 
@@ -62,8 +63,10 @@ export const LoginScreen = () => {
       const errorMessage =
         error instanceof Error ? error.message : t('errors.generic');
 
+      const authErrorMessage = getAuthErrorMessage(errorMessage, t);
+
       // Show error toast instead of Alert
-      showErrorToast(errorMessage, t('errors.loginFailed'));
+      showErrorToast(authErrorMessage, t('errors.loginFailed'));
     }
   };
 

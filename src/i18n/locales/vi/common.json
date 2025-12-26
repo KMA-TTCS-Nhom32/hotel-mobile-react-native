@@ -109,7 +109,8 @@
     "byNight": "Qua đêm",
     "byDay": "Theo ngày",
     "viewDetails": "Xem chi tiết",
-    "nights": "đêm"
+    "nights": "đêm",
+    "chooseRoom": "Chọn phòng"
   },
   "branchDetail": {
     "loadingBranch": "Đang tải thông tin chi nhánh...",

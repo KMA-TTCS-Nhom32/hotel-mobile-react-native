@@ -12,8 +12,8 @@ importers:
   .:
     dependencies:
       '@ahomevilla-hotel/node-sdk':
-        specifier: 2025.12.2-3.103119
-        version: 2025.12.2-3.103119
+        specifier: 2025.12.2-5.162723
+        version: 2025.12.2-5.162723
       '@expo/vector-icons':
         specifier: ^15.0.3
         version: 15.0.3(expo-font@14.0.10(expo@54.0.30)(react-native@0.81.5(@babel/core@7.28.5)(@types/react@19.1.17)(react@19.1.0))(react@19.1.0))(react-native@0.81.5(@babel/core@7.28.5)(@types/react@19.1.17)(react@19.1.0))(react@19.1.0)
@@ -263,8 +263,8 @@ packages:
       graphql:
         optional: true
 
-  '@ahomevilla-hotel/node-sdk@2025.12.2-3.103119':
-    resolution: {integrity: sha512-zL8r9RWGubyGnuCpS8rPtUlfOekuNuqzmeaAwpSX/cc/vUFTSSqoDqZasKVJCClRjqY1Rss4SqYQhxirUqXcUw==}
+  '@ahomevilla-hotel/node-sdk@2025.12.2-5.162723':
+    resolution: {integrity: sha512-Uj6uY9RYYXwsXXE+BBco8mqioJ5mRXKOds5S9zQRY4adCKXSYUImhG6CHoUNDjGHb/xoY9ReH1lLEZyOS7GkUQ==}
 
   '@alloc/quick-lru@5.2.0':
     resolution: {integrity: sha512-UrcABB+4bUrFABwbluTIBErXwvbsU/V7TZWfmbgJfbkwiBuziS9gxdODUyuiecfdGQ85jglMW6juS3+z5TsKLw==}
@@ -5534,7 +5534,7 @@ snapshots:
 
   '@0no-co/graphql.web@1.2.0': {}
 
-  '@ahomevilla-hotel/node-sdk@2025.12.2-3.103119':
+  '@ahomevilla-hotel/node-sdk@2025.12.2-5.162723':
     dependencies:
       axios: 1.13.2
     transitivePeerDependencies:

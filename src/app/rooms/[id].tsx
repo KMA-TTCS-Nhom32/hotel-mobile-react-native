@@ -362,7 +362,7 @@ export default function RoomDetailScreen() {
               onPress={handleProceedToPayment}
               disabled={!room.is_available}
               // style={{ paddingHorizontal: 24, paddingVertical: 10 }}
-              className='rounded-[9999px] px-6 py-2.5'
+              className='rounded-3xl px-6 py-2.5'
               textStyle={{
                 fontSize: 15,
               }}

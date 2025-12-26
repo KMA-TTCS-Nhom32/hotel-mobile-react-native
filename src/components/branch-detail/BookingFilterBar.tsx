@@ -38,7 +38,7 @@ export function BookingFilterBar({ filters, onPress }: BookingFilterBarProps) {
           >
             {dateTimeText}
           </Text>
-          <Text className='text-xs text-primary-dark'>{guestsText}</Text>
+          <Text className='text-sm text-primary-dark'>{guestsText}</Text>
         </View>
       </View>
 

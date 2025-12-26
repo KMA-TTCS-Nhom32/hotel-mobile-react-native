@@ -14,6 +14,7 @@ import {
   View,
 } from 'react-native';
 
+import { Button } from '@/components/ui/Button';
 import { HEX_COLORS } from '@/config/colors';
 import { useCommonTranslation, useLanguage } from '@/i18n/hooks';
 import { roomService } from '@/services/rooms/roomService';
@@ -54,7 +55,7 @@ export function RoomsSection({ branchId }: RoomsSectionProps) {
   const { data, isLoading, isError } = useQuery({
     queryKey: ['rooms', 'branch', branchId, filters],
     queryFn: () =>
-      roomService.searchRoomsPagination(1, 10, {
+      roomService.searchRoomsPagination(1, 100, {
         branchId,
         bookingType: filters.bookingType as FilterRoomDetailDtoBookingTypeEnum,
         startDate: formatDateForAPI(filters.startDate),
@@ -62,7 +63,8 @@ export function RoomsSection({ branchId }: RoomsSectionProps) {
         startTime: filters.startTime,
         endTime: filters.endTime,
         adults: filters.adults,
-        children: filters.children + filters.infants,
+        children: filters.children,
+        excludeFullyBooked: false,
       }),
     staleTime: 1000 * 60 * 5, // 5 minutes
   });
@@ -143,18 +145,25 @@ export function RoomsSection({ branchId }: RoomsSectionProps) {
         </View>
       ) : rooms.length > 0 ? (
         <View className='gap-4'>
-          <Text className='text-sm text-text-secondary'>
+          {/* <Text className='text-sm text-text-secondary'>
             {t('roomSearch.foundRooms', { count: rooms.length })}
-          </Text>
-          {rooms.slice(0, 5).map(room => {
+          </Text> */}
+          {rooms.map(room => {
             const displayData = getRoomDisplayData(room);
             const lowestPrice = getLowestPrice(room);
+            const availableCount = room.availableRoomsCount ?? 0;
+            const isAvailable = availableCount > 0;
 
             return (
               <Pressable
                 key={room.id}
-                onPress={() => handleRoomPress(room)}
-                className='overflow-hidden rounded-xl border border-neutral-light bg-background-primary active:opacity-80'
+                onPress={() => isAvailable && handleRoomPress(room)}
+                disabled={!isAvailable}
+                className={`overflow-hidden rounded-xl border bg-background-primary ${
+                  isAvailable
+                    ? 'border-neutral-light active:opacity-80'
+                    : 'border-neutral-lighter opacity-60'
+                }`}
                 style={{ width: CARD_WIDTH }}
               >
                 {/* Room Image */}
@@ -165,24 +174,25 @@ export function RoomsSection({ branchId }: RoomsSectionProps) {
                     }}
                     className='h-full w-full'
                     resizeMode='cover'
+                    style={!isAvailable ? { opacity: 0.5 } : undefined}
                   />
                   {/* Availability Badge */}
                   <View
                     className={`absolute right-3 top-3 rounded-full px-3 py-1 ${
-                      room.is_available
-                        ? 'bg-success-lighter'
-                        : 'bg-neutral-lighter'
+                      isAvailable ? 'bg-success-lighter' : 'bg-neutral-lighter'
                     }`}
                   >
                     <Text
                       className={`text-xs font-medium ${
-                        room.is_available
+                        isAvailable
                           ? 'text-success-darkest'
                           : 'text-neutral-darkest'
                       }`}
                     >
-                      {room.is_available
-                        ? t('branchDetail.available')
+                      {isAvailable
+                        ? t('branchDetail.roomsAvailable', {
+                            count: availableCount,
+                          })
                         : t('branchDetail.notAvailable')}
                     </Text>
                   </View>
@@ -197,7 +207,8 @@ export function RoomsSection({ branchId }: RoomsSectionProps) {
                         {displayData.name}
                       </Text>
                       <Text className='text-xs text-text-tertiary'>
-                        {t(`branchDetail.roomType.${room.room_type}`)} •{' '}
+                        {t(`branchDetail.roomType.${room.room_type}`)}
+                        {' • '}
                         {t(`branchDetail.bedType.${room.bed_type}`)}
                       </Text>
                     </View>
@@ -211,61 +222,75 @@ export function RoomsSection({ branchId }: RoomsSectionProps) {
                     </View>
                   </View>
 
-                  {/* Room Details */}
-                  <View className='mb-3 flex-row flex-wrap gap-3'>
-                    <View className='flex-row items-center gap-1'>
-                      <MaterialIcons
-                        name='square-foot'
-                        size={16}
-                        color={HEX_COLORS.text.secondary}
-                      />
-                      <Text className='text-xs text-text-secondary'>
-                        {room.area} {t('branchDetail.sqm')}
-                      </Text>
-                    </View>
-                    <View className='flex-row items-center gap-1'>
-                      <MaterialIcons
-                        name='people'
-                        size={16}
-                        color={HEX_COLORS.text.secondary}
-                      />
-                      <Text className='text-xs text-text-secondary'>
-                        {room.max_adults} {t('branchDetail.adults')}
-                        {room.max_children > 0 &&
-                          `, ${room.max_children} ${t('branchDetail.children')}`}
-                      </Text>
-                    </View>
-                  </View>
-
-                  {/* Amenities */}
-                  {room.amenities && room.amenities.length > 0 && (
-                    <View className='flex-row flex-wrap gap-2'>
-                      {room.amenities.slice(0, 3).map(amenity => (
-                        <View
-                          key={amenity.id}
-                          className='flex-row items-center gap-1.5 rounded-md bg-background-secondary px-2 py-1'
-                        >
-                          {amenity.icon?.url && (
-                            <ExpoImage
-                              source={{ uri: amenity.icon.url }}
-                              style={{ width: 14, height: 14 }}
-                              contentFit='contain'
-                            />
-                          )}
-                          <Text className='text-xs text-text-tertiary'>
-                            {getAmenityDisplayName(amenity)}
+                  <View className='flex-row items-end justify-between'>
+                    <View>
+                      {/* Room Details */}
+                      <View className='mb-3 flex-row flex-wrap gap-3'>
+                        <View className='flex-row items-center gap-1'>
+                          <MaterialIcons
+                            name='square-foot'
+                            size={16}
+                            color={HEX_COLORS.text.secondary}
+                          />
+                          <Text className='text-xs text-text-secondary'>
+                            {room.area} {t('branchDetail.sqm')}
                           </Text>
                         </View>
-                      ))}
-                      {room.amenities.length > 3 && (
-                        <View className='rounded-md bg-background-secondary px-2 py-1'>
-                          <Text className='text-xs text-text-tertiary'>
-                            +{room.amenities.length - 3}
+                        <View className='flex-row items-center gap-1'>
+                          <MaterialIcons
+                            name='people'
+                            size={16}
+                            color={HEX_COLORS.text.secondary}
+                          />
+                          <Text className='text-xs text-text-secondary'>
+                            {room.max_adults} {t('branchDetail.adults')}
+                            {room.max_children > 0 &&
+                              `, ${room.max_children} ${t('branchDetail.children')}`}
                           </Text>
+                        </View>
+                      </View>
+
+                      {/* Amenities */}
+                      {room.amenities && room.amenities.length > 0 && (
+                        <View className='flex-row flex-wrap gap-2'>
+                          {room.amenities.slice(0, 3).map(amenity => (
+                            <View
+                              key={amenity.id}
+                              className='flex-row items-center gap-1.5 rounded-md bg-background-secondary px-2 py-1'
+                            >
+                              {amenity.icon?.url && (
+                                <ExpoImage
+                                  source={{ uri: amenity.icon.url }}
+                                  style={{ width: 14, height: 14 }}
+                                  contentFit='contain'
+                                />
+                              )}
+                              <Text className='text-xs text-text-tertiary'>
+                                {getAmenityDisplayName(amenity)}
+                              </Text>
+                            </View>
+                          ))}
+                          {room.amenities.length > 3 && (
+                            <View className='rounded-md bg-background-secondary px-2 py-1'>
+                              <Text className='text-xs text-text-tertiary'>
+                                +{room.amenities.length - 3}
+                              </Text>
+                            </View>
+                          )}
                         </View>
                       )}
                     </View>
-                  )}
+                    <Button
+                      title={t('roomSearch.chooseRoom')}
+                      onPress={() => handleRoomPress(room)}
+                      disabled={!room.is_available}
+                      // style={{ paddingHorizontal: 24, paddingVertical: 10 }}
+                      className='rounded-3xl'
+                      textStyle={{
+                        fontSize: 14,
+                      }}
+                    />
+                  </View>
                 </View>
               </Pressable>
             );

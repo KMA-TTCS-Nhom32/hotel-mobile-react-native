@@ -128,6 +128,7 @@ export const getAuthErrorMessage = (
   const errorMap: Record<string, string> = {
     invalidEmailOrPhone: t('errors.invalidEmailOrPhone'),
     wrongUsernameOrPassword: t('errors.wrongUsernameOrPassword'),
+    userNotFound: t('errors.wrongUsernameOrPassword'),
     invalidRefreshToken: t('errors.invalidRefreshToken'),
     phoneIsRequired: t('errors.phoneIsRequired'),
     emailIsRequired: t('errors.emailIsRequired'),
