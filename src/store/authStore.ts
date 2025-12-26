@@ -1,9 +1,9 @@
 import type { User } from '@ahomevilla-hotel/node-sdk';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 
 import { authService } from '@/services/auth/authService';
+import { secureStorageAdapter } from '@/utils/secureStorage';
 
 interface AuthState {
   // User data (persisted)
@@ -62,7 +62,7 @@ export const useAuthStore = create<AuthState>()(
       //     await Storage.removeItem(name);
       //   },
       // })),
-      storage: createJSONStorage(() => AsyncStorage),
+      storage: createJSONStorage(() => secureStorageAdapter),
       // Only persist user data
       partialize: state => ({
         user: state.user,
