@@ -85,7 +85,8 @@
     "adultsCount": "{{count}} adult",
     "adultsCount_other": "{{count}} adults",
     "childrenCount": "{{count}} child",
-    "childrenCount_other": "{{count}} children"
+    "childrenCount_other": "{{count}} children",
+    "total": "total"
   },
   "roomSearch": {
     "title": "Available Rooms",
@@ -230,7 +231,9 @@
     "selectDateRange": "Select Date Range",
     "selectDateRangePlaceholder": "Tap to select check-in and check-out dates",
     "dailyBookingInfo": "Daily Booking Details",
-    "dailyBookingNote": "Check-in time: 2:00 PM, Check-out time: 12:00 PM. Minimum 1 day stay required."
+    "dailyBookingNote": "Check-in time: 2:00 PM, Check-out time: 12:00 PM. Minimum 1 day stay required.",
+    "bookedBy": "Booked By",
+    "bookingType": "Booking Type"
   },
 
   "bookings": {

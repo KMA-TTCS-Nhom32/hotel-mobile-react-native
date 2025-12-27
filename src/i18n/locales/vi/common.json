@@ -85,7 +85,8 @@
     "adultsCount": "{{count}} người lớn",
     "adultsCount_other": "{{count}} người lớn",
     "childrenCount": "{{count}} trẻ em",
-    "childrenCount_other": "{{count}} trẻ em"
+    "childrenCount_other": "{{count}} trẻ em",
+    "total": "tổng"
   },
   "roomSearch": {
     "title": "Phòng phù hợp",
@@ -230,7 +231,9 @@
     "selectDateRange": "Chọn Khoảng Ngày",
     "selectDateRangePlaceholder": "Nhấn để chọn ngày nhận và trả phòng",
     "dailyBookingInfo": "Thông tin đặt phòng theo ngày",
-    "dailyBookingNote": "Giờ nhận phòng: 14:00, Giờ trả phòng: 12:00 trưa. Yêu cầu nghỉ tối thiểu 1 ngày."
+    "dailyBookingNote": "Giờ nhận phòng: 14:00, Giờ trả phòng: 12:00 trưa. Yêu cầu nghỉ tối thiểu 1 ngày.",
+    "bookedBy": "Người đặt",
+    "bookingType": "Loại đặt phòng"
   },
 
   "bookings": {
