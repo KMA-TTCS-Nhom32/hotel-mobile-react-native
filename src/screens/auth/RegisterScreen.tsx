@@ -22,7 +22,6 @@ import { OTPInputModal } from '@/components/auth';
 import { Button, Input } from '@/components/ui';
 import { useAuthTranslation } from '@/i18n/hooks';
 import { authService } from '@/services/auth/authService';
-import { getAuthErrorMessage } from '@/utils/errors';
 import { showErrorToast, showSuccessToast } from '@/utils/toast';
 import {
   createRegisterSchema,
@@ -121,12 +120,8 @@ export const RegisterScreen = () => {
         router.replace('/auth/login');
       }
     } catch (error) {
+      // Error toast is shown automatically by API interceptor
       console.error('Registration error:', error);
-      const errorMessage =
-        error instanceof Error
-          ? getAuthErrorMessage(error.message, t)
-          : t('errors.generic');
-      showErrorToast(errorMessage);
     } finally {
       setIsLoading(false);
     }

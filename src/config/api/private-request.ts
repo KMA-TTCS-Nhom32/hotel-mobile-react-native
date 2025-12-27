@@ -7,7 +7,10 @@ import type { AxiosResponse } from 'axios';
 import i18n from 'i18next';
 
 import { ENV, IS_PRODUCTION } from '@/config';
-import { transformAxiosError } from '@/utils/errors';
+import {
+  transformAxiosError,
+  transformAxiosErrorWithToast,
+} from '@/utils/errors';
 import { Storage } from '@/utils/storage';
 
 import { ENDPOINTS } from './endpoints';
@@ -214,7 +217,7 @@ privateRequest.interceptors.request.use(
   }
 );
 
-// Response interceptor to handle token refresh and transform errors
+// Response interceptor to handle token refresh, transform errors, and show toast
 privateRequest.interceptors.response.use(
   (response: AxiosResponse) => {
     return response;
@@ -239,15 +242,15 @@ privateRequest.interceptors.response.use(
       } catch (refreshError) {
         console.error('Token refresh failed:', refreshError);
 
-        // Clear tokens and reject with transformed error
+        // Clear tokens and reject with transformed error (silent - no toast for auth redirect)
         await TokenManager.clearTokens();
 
         return Promise.reject(transformAxiosError(error));
       }
     }
 
-    // Transform all errors to AppError
-    return Promise.reject(transformAxiosError(error));
+    // Transform error and show toast automatically (uses i18n internally)
+    return Promise.reject(transformAxiosErrorWithToast(error));
   }
 );
 

@@ -261,6 +261,52 @@
   "retry": "Try Again",
   "errors": {
     "failedToLoad": "Failed to load data",
-    "generic": "Something went wrong. Please try again later."
+    "generic": "Something went wrong. Please try again later.",
+    "networkError": "Network connection failed. Please check your internet.",
+    "timeout": "Request timed out. Please try again.",
+
+    "notFound": "The requested resource was not found.",
+    "eitherPhoneOrEmailIsRequired": "Either phone number or email is required.",
+    "emailExisted": "This email is already registered.",
+    "phoneExisted": "This phone number is already registered.",
+    "userNotFound": "User not found.",
+    "phoneLengthError": "Phone number must be 10-11 digits.",
+    "invalidPhoneFormat": "Invalid phone number format.",
+    "nameTooShort": "Name is too short.",
+    "nameTooLong": "Name is too long.",
+    "invalidAvatarUrl": "Invalid avatar URL.",
+    "emptyUpdatePayload": "No changes to update.",
+    "userHasActiveBookings": "Cannot proceed. You have active bookings.",
+    "imageNotFound": "Image not found.",
+    "getImageFailed": "Failed to load image.",
+    "requestFailed": "Request failed. Please try again.",
+
+    "roleNotFound": "Role not found.",
+    "cannotBeAdmin": "Cannot assign admin role.",
+    "cannotBeStaff": "Cannot assign staff role.",
+    "cannotBeCustomer": "Cannot assign customer role.",
+    "invalidRoleChange": "Invalid role change.",
+
+    "invalidEmailOrPhone": "Invalid email or phone number.",
+    "wrongUsernameOrPassword": "Incorrect email/phone or password.",
+    "invalidRefreshToken": "Session expired. Please login again.",
+    "phoneIsRequired": "Phone number is required.",
+    "emailIsRequired": "Email is required.",
+    "emailNotVerified": "Please verify your email first.",
+    "phoneNotVerified": "Please verify your phone number first.",
+    "userAlreadyExists": "This account already exists.",
+    "sentEmailFailed": "Failed to send email. Please try again.",
+
+    "invalidImageFormat": "Invalid image format.",
+    "invalidImageSize": "Image size is too large.",
+    "invalidImageType": "Invalid image type.",
+    "invalidImageUrl": "Invalid image URL.",
+    "imageUploadFailed": "Failed to upload image.",
+    "imageDeleteFailed": "Failed to delete image.",
+
+    "roomNotFound": "Room not found.",
+
+    "maximumGuestsExceeded": "Maximum number of guests exceeded.",
+    "bookingNotFound": "Booking not found."
   }
 }

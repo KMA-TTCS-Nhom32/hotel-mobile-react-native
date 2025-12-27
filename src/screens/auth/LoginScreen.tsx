@@ -18,8 +18,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useAuthTranslation } from '@/i18n/hooks';
 import { authService } from '@/services/auth/authService';
 import { useAuthStore } from '@/store/authStore';
-import { getAuthErrorMessage } from '@/utils/errors';
-import { showErrorToast, showSuccessToast } from '@/utils/toast';
+import { showSuccessToast } from '@/utils/toast';
 import { createLoginSchema, LoginFormData } from '@/utils/validation';
 
 /**
@@ -60,13 +59,8 @@ export const LoginScreen = () => {
 
       // Navigation will be handled by the ProtectedRoute wrapper
     } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : t('errors.generic');
-
-      const authErrorMessage = getAuthErrorMessage(errorMessage, t);
-
-      // Show error toast instead of Alert
-      showErrorToast(authErrorMessage, t('errors.loginFailed'));
+      // Error toast is shown automatically by API interceptor
+      console.error('Login error:', error);
     }
   };
 

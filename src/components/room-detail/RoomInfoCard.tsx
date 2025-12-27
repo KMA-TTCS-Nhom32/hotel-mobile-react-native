@@ -108,7 +108,7 @@ export function RoomInfoCard({ room }: RoomInfoCardProps) {
         </View>
 
         {/* Quantity Available */}
-        {room.quantity > 0 && (
+        {room.availableRoomsCount && room.availableRoomsCount > 0 && (
           <View className='flex-row items-center gap-2'>
             <View className='h-10 w-10 items-center justify-center rounded-full bg-primary-lighter'>
               <MaterialIcons
@@ -123,7 +123,9 @@ export function RoomInfoCard({ room }: RoomInfoCardProps) {
               </Text>
               <Text className='font-semibold text-text-primary'>
                 {/* {room.quantity}{' '} */}
-                {t('branchDetail.roomsAvailable', { count: room.quantity })}
+                {t('branchDetail.roomsAvailable', {
+                  count: room.availableRoomsCount,
+                })}
               </Text>
             </View>
           </View>

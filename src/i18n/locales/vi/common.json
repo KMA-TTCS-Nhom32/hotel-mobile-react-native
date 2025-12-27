@@ -261,6 +261,52 @@
   "retry": "Thử lại",
   "errors": {
     "failedToLoad": "Không thể tải dữ liệu",
-    "generic": "Đã xảy ra lỗi. Vui lòng thử lại sau."
+    "generic": "Đã xảy ra lỗi. Vui lòng thử lại sau.",
+    "networkError": "Kết nối mạng thất bại. Vui lòng kiểm tra internet.",
+    "timeout": "Yêu cầu quá thời gian. Vui lòng thử lại.",
+
+    "notFound": "Không tìm thấy tài nguyên yêu cầu.",
+    "eitherPhoneOrEmailIsRequired": "Cần nhập số điện thoại hoặc email.",
+    "emailExisted": "Email này đã được đăng ký.",
+    "phoneExisted": "Số điện thoại này đã được đăng ký.",
+    "userNotFound": "Không tìm thấy người dùng.",
+    "phoneLengthError": "Số điện thoại phải có 10-11 chữ số.",
+    "invalidPhoneFormat": "Định dạng số điện thoại không hợp lệ.",
+    "nameTooShort": "Tên quá ngắn.",
+    "nameTooLong": "Tên quá dài.",
+    "invalidAvatarUrl": "URL ảnh đại diện không hợp lệ.",
+    "emptyUpdatePayload": "Không có thay đổi để cập nhật.",
+    "userHasActiveBookings": "Không thể thực hiện. Bạn có đặt phòng đang hoạt động.",
+    "imageNotFound": "Không tìm thấy hình ảnh.",
+    "getImageFailed": "Không thể tải hình ảnh.",
+    "requestFailed": "Yêu cầu thất bại. Vui lòng thử lại.",
+
+    "roleNotFound": "Không tìm thấy vai trò.",
+    "cannotBeAdmin": "Không thể gán vai trò quản trị viên.",
+    "cannotBeStaff": "Không thể gán vai trò nhân viên.",
+    "cannotBeCustomer": "Không thể gán vai trò khách hàng.",
+    "invalidRoleChange": "Thay đổi vai trò không hợp lệ.",
+
+    "invalidEmailOrPhone": "Email hoặc số điện thoại không hợp lệ.",
+    "wrongUsernameOrPassword": "Sai email/số điện thoại hoặc mật khẩu.",
+    "invalidRefreshToken": "Phiên đã hết hạn. Vui lòng đăng nhập lại.",
+    "phoneIsRequired": "Số điện thoại là bắt buộc.",
+    "emailIsRequired": "Email là bắt buộc.",
+    "emailNotVerified": "Vui lòng xác minh email trước.",
+    "phoneNotVerified": "Vui lòng xác minh số điện thoại trước.",
+    "userAlreadyExists": "Tài khoản này đã tồn tại.",
+    "sentEmailFailed": "Gửi email thất bại. Vui lòng thử lại.",
+
+    "invalidImageFormat": "Định dạng hình ảnh không hợp lệ.",
+    "invalidImageSize": "Kích thước hình ảnh quá lớn.",
+    "invalidImageType": "Loại hình ảnh không hợp lệ.",
+    "invalidImageUrl": "URL hình ảnh không hợp lệ.",
+    "imageUploadFailed": "Tải lên hình ảnh thất bại.",
+    "imageDeleteFailed": "Xóa hình ảnh thất bại.",
+
+    "roomNotFound": "Không tìm thấy phòng.",
+
+    "maximumGuestsExceeded": "Vượt quá số lượng khách tối đa.",
+    "bookingNotFound": "Không tìm thấy đặt phòng."
   }
 }

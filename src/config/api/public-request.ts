@@ -2,7 +2,7 @@ import axios, { AxiosError } from 'axios';
 import i18n from 'i18next';
 
 import { ENV, IS_PRODUCTION } from '@/config';
-import { transformAxiosError } from '@/utils/errors';
+import { transformAxiosErrorWithToast } from '@/utils/errors';
 
 const publicRequest = axios.create({
   baseURL: ENV.API_URL,
@@ -27,11 +27,12 @@ publicRequest.interceptors.request.use(
   }
 );
 
-// Response interceptor to transform errors to AppError
+// Response interceptor to transform errors to AppError and show toast
 publicRequest.interceptors.response.use(
   response => response,
   (error: AxiosError) => {
-    return Promise.reject(transformAxiosError(error));
+    // Transform error and show toast automatically (uses i18n internally)
+    return Promise.reject(transformAxiosErrorWithToast(error));
   }
 );
 
