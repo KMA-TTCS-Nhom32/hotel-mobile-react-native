@@ -77,4 +77,12 @@ export interface IAuthService {
   resetPasswordWithOTP(
     payload: ResetPasswordWithOTPEmailDto
   ): Promise<ResponseWithMessage>;
+
+  /**
+   * Verify OTP code for forgot password (separate step)
+   */
+  verifyForgotPasswordOTP(
+    email: string,
+    code: string
+  ): Promise<{ success: boolean; message: string; userId: string }>;
 }

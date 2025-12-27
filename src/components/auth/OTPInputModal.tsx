@@ -171,29 +171,44 @@ export const OTPInputModal: React.FC<OTPInputModalProps> = ({
   // Handle form submission
   const handleSubmit = async () => {
     setIsSubmitting(true);
+    const otpValue = otpDigits.join('');
+    console.log('[OTPInputModal] Bắt đầu xác thực OTP:', {
+      mode,
+      email,
+      otp: otpValue.substring(0, 2) + '****',
+    });
 
     try {
       if (mode === 'register') {
         // Verify email with OTP - requires userId from registration
         if (!userId) {
+          console.error(
+            '[OTPInputModal] Lỗi: Thiếu userId cho xác thực đăng ký'
+          );
           throw new Error('User ID is required for email verification');
         }
-        const otpValue = otpDigits.join('');
+        console.log('[OTPInputModal] Đang xác thực OTP đăng ký:', {
+          userId,
+          code: otpValue.substring(0, 2) + '****',
+        });
         const payload: VerifyEmailDto = {
           userId,
           code: otpValue,
         };
-        await authService.verifyEmail(payload);
+        const result = await authService.verifyEmail(payload);
+        console.log('[OTPInputModal] Xác thực OTP đăng ký thành công:', result);
         showSuccessToast(t('success.otpVerified'));
       } else {
         // Reset password with OTP
+        console.log('[OTPInputModal] Đang đặt lại mật khẩu với OTP');
         const formData = forgotPasswordForm.getValues();
         const payload: ResetPasswordWithOTPEmailDto = {
           email,
           code: formData.otp,
           newPassword: formData.newPassword,
         };
-        await authService.resetPasswordWithOTP(payload);
+        const result = await authService.resetPasswordWithOTP(payload);
+        console.log('[OTPInputModal] Đặt lại mật khẩu thành công:', result);
         showSuccessToast(
           t('otp.passwordResetSuccess') || 'Password reset successfully!'
         );
@@ -201,6 +216,7 @@ export const OTPInputModal: React.FC<OTPInputModalProps> = ({
 
       onSuccess();
     } catch (error) {
+      console.error('[OTPInputModal] Lỗi xác thực OTP:', error);
       const errorMessage =
         error instanceof Error ? error.message : t('errors.generic');
       showErrorToast(errorMessage);

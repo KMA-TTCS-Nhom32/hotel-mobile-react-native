@@ -148,11 +148,24 @@ export class AuthService implements IAuthService {
   verifyEmail = async (
     payload: VerifyEmailDto
   ): Promise<ResponseWithMessage> => {
-    const response = await publicRequest.post<ResponseWithMessage>(
-      ENDPOINTS.VERIFY_EMAIL,
-      payload
-    );
-    return response.data;
+    console.log('[AuthService] Gọi verifyEmail (xác thực đăng ký):', {
+      userId: payload.userId,
+      code: payload.code.substring(0, 2) + '****',
+    });
+    try {
+      const response = await publicRequest.post<ResponseWithMessage>(
+        ENDPOINTS.VERIFY_EMAIL,
+        payload
+      );
+      console.log(
+        '[AuthService] Phản hồi verifyEmail thành công:',
+        response.data
+      );
+      return response.data;
+    } catch (error) {
+      console.error('[AuthService] Lỗi verifyEmail:', error);
+      throw error;
+    }
   };
 
   /**
@@ -161,9 +174,39 @@ export class AuthService implements IAuthService {
   initiateForgotPassword = async (
     payload: InitiateForgotPasswordEmailDto
   ): Promise<ResponseWithMessage> => {
+    console.log('[AuthService] Gọi initiateForgotPassword:', {
+      email: payload.email,
+    });
     const response = await publicRequest.post<ResponseWithMessage>(
       ENDPOINTS.INITIATE_EMAIL,
       payload
+    );
+    console.log(
+      '[AuthService] Phản hồi initiateForgotPassword:',
+      response.data
+    );
+    return response.data;
+  };
+
+  /**
+   * Verify OTP code for forgot password (separate step)
+   */
+  verifyForgotPasswordOTP = async (
+    email: string,
+    code: string
+  ): Promise<{ success: boolean; message: string; userId: string }> => {
+    console.log('[AuthService] Gọi verifyForgotPasswordOTP:', {
+      email,
+      code: code.substring(0, 2) + '****',
+    });
+    const response = await publicRequest.post<{
+      success: boolean;
+      message: string;
+      userId: string;
+    }>(ENDPOINTS.VERIFY_FORGOT_PASSWORD_OTP, { email, code });
+    console.log(
+      '[AuthService] Phản hồi verifyForgotPasswordOTP:',
+      response.data
     );
     return response.data;
   };
@@ -174,10 +217,14 @@ export class AuthService implements IAuthService {
   resetPasswordWithOTP = async (
     payload: ResetPasswordWithOTPEmailDto
   ): Promise<ResponseWithMessage> => {
+    console.log('[AuthService] Gọi resetPasswordWithOTP:', {
+      email: payload.email,
+    });
     const response = await publicRequest.post<ResponseWithMessage>(
       ENDPOINTS.RESET_PASSWORD,
       payload
     );
+    console.log('[AuthService] Phản hồi resetPasswordWithOTP:', response.data);
     return response.data;
   };
 }
