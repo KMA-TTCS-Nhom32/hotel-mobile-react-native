@@ -27,7 +27,11 @@ export const GuestCounter: React.FC<GuestCounterProps> = ({
 
     if (type === 'adults' && guests.adults < maxAdults) {
       newGuests.adults += 1;
-    } else if (type === 'children' && guests.children < maxChildren) {
+    } else if (
+      type === 'children' &&
+      guests.children < maxChildren &&
+      maxChildren > 0
+    ) {
       newGuests.children += 1;
     } else if (type === 'infants') {
       newGuests.infants += 1;

@@ -8,6 +8,8 @@ import { Image } from 'expo-image';
 import React from 'react';
 import { Text, View } from 'react-native';
 
+import { useLanguage } from '@/i18n/hooks';
+
 interface RoomBookingSummaryProps {
   room: RoomDetail;
   checkInDate: string;
@@ -27,6 +29,8 @@ export const RoomBookingSummary: React.FC<RoomBookingSummaryProps> = ({
   bookingType,
   price,
 }) => {
+  const { currentLanguage } = useLanguage();
+
   return (
     <View className='rounded-2xl border border-neutral-light bg-white p-4'>
       {/* Room Info Row */}
@@ -49,7 +53,9 @@ export const RoomBookingSummary: React.FC<RoomBookingSummaryProps> = ({
         {/* Room Details */}
         <View className='flex-1'>
           <Text className='text-base font-semibold text-neutral-darkest'>
-            {room.name}
+            {room.translations.find(
+              t => t.language === currentLanguage.toUpperCase()
+            )?.name || room.name}
           </Text>
           <Text className='mt-1 text-xs text-neutral-main'>
             {room.room_type} • {room.bed_type}

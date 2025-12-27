@@ -72,6 +72,7 @@ export function RoomsSection({ branchId }: RoomsSectionProps) {
   const rooms = data?.data || [];
   // display logs in breaking lines
   // console.log('rooms', JSON.stringify(rooms, null, 2));
+  console.log('data', JSON.stringify(data, null, 2));
 
   const getRoomDisplayData = (room: RoomDetail) => {
     const translation = room.translations?.find(

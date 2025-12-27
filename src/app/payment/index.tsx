@@ -307,7 +307,7 @@ export default function PaymentScreen() {
           <GuestCounter
             guests={guests}
             maxAdults={room.max_adults || 2}
-            maxChildren={room.max_children || 1}
+            maxChildren={room.max_children || 0}
             onChange={setGuests}
           />
         </View>
