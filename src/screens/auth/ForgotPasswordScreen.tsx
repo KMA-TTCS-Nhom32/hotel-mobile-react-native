@@ -2,7 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
-import { Controller, useForm } from 'react-hook-form';
+import { FormProvider, useForm } from 'react-hook-form';
 import {
   KeyboardAvoidingView,
   Platform,
@@ -13,10 +13,11 @@ import {
 } from 'react-native';
 
 import { OTPInputModal } from '@/components/auth';
-import { Button, Input } from '@/components/ui';
+import { InputText } from '@/components/forms';
+import { Button } from '@/components/ui';
 import { useAuthTranslation } from '@/i18n/hooks';
 import { authService } from '@/services/auth/authService';
-import { showErrorToast, showSuccessToast } from '@/utils/toast';
+import { showSuccessToast } from '@/utils/toast';
 import {
   createForgotPasswordEmailSchema,
   type ForgotPasswordEmailFormData,
@@ -35,15 +36,12 @@ export const ForgotPasswordScreen = () => {
   const [showOtpModal, setShowOtpModal] = useState(false);
   const [submittedEmail, setSubmittedEmail] = useState('');
 
-  const {
-    control,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<ForgotPasswordEmailFormData>({
+  const form = useForm<ForgotPasswordEmailFormData>({
     resolver: zodResolver(createForgotPasswordEmailSchema(t)),
     defaultValues: {
       email: '',
     },
+    mode: 'onTouched',
   });
 
   const onSubmit = async (data: ForgotPasswordEmailFormData) => {
@@ -63,10 +61,8 @@ export const ForgotPasswordScreen = () => {
       // Open OTP modal
       setShowOtpModal(true);
     } catch (error) {
+      // Error toast is shown automatically by API interceptor
       console.error('Forgot password error:', error);
-      const errorMessage =
-        error instanceof Error ? error.message : t('errors.generic');
-      showErrorToast(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -111,55 +107,40 @@ export const ForgotPasswordScreen = () => {
             </View>
 
             {/* Form */}
-            <View className='space-y-4'>
-              {/* Email Input */}
-              <View>
-                <Text className='mb-2 text-sm font-medium text-orange-800'>
-                  {t('form.emailOrPhone') || 'Email'} *
-                </Text>
-                <Controller
-                  control={control}
+            <FormProvider {...form}>
+              <View className='gap-4'>
+                {/* Email Input */}
+                <InputText
                   name='email'
-                  render={({ field: { onChange, onBlur, value } }) => (
-                    <Input
-                      value={value}
-                      onChangeText={onChange}
-                      onBlur={onBlur}
-                      placeholder={
-                        t('form.emailOrPhonePlaceholder') || 'Enter your email'
-                      }
-                      keyboardType='email-address'
-                      autoCapitalize='none'
-                      autoComplete='email'
-                      editable={!isLoading}
-                      className='border-orange-200 bg-white focus:border-orange-400'
-                    />
-                  )}
-                />
-                {errors.email && (
-                  <Text className='mt-1 text-xs text-red-600'>
-                    {errors.email.message}
-                  </Text>
-                )}
-              </View>
-
-              {/* Submit Button */}
-              <View style={{ marginTop: 24 }}>
-                <Button
-                  title={
-                    isLoading
-                      ? t('otp.sending') || 'Sending...'
-                      : t('otp.sendCode') || 'Send Reset Code'
+                  label={t('form.emailOrPhone') || 'Email'}
+                  placeholder={
+                    t('form.emailOrPhonePlaceholder') || 'Enter your email'
                   }
-                  onPress={handleSubmit(onSubmit)}
-                  variant='primary'
-                  fullWidth
+                  required
                   disabled={isLoading}
-                  loading={isLoading}
-                  style={{ backgroundColor: '#f97316' }}
+                  keyboardType='email-address'
+                  autoCapitalize='none'
+                  autoComplete='email'
                 />
+
+                {/* Submit Button */}
+                <View style={{ marginTop: 8 }}>
+                  <Button
+                    title={
+                      isLoading
+                        ? t('otp.sending') || 'Sending...'
+                        : t('otp.sendCode') || 'Send Reset Code'
+                    }
+                    onPress={form.handleSubmit(onSubmit)}
+                    variant='primary'
+                    fullWidth
+                    disabled={isLoading}
+                    loading={isLoading}
+                    style={{ backgroundColor: '#f97316' }}
+                  />
+                </View>
               </View>
-            </View>
+            </FormProvider>
 
             {/* Back to Login Link */}
             <View className='mt-6 items-center'>

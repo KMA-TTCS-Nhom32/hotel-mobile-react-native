@@ -7,9 +7,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Image } from 'expo-image';
 import { Link, useRouter } from 'expo-router';
 import { useState } from 'react';
-import { Controller, useForm } from 'react-hook-form';
+import { FormProvider, useForm } from 'react-hook-form';
 import {
-  // ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -19,7 +18,8 @@ import {
 } from 'react-native';
 
 import { OTPInputModal } from '@/components/auth';
-import { Button, Input } from '@/components/ui';
+import { InputText } from '@/components/forms';
+import { Button } from '@/components/ui';
 import { useAuthTranslation } from '@/i18n/hooks';
 import { authService } from '@/services/auth/authService';
 import { showErrorToast, showSuccessToast } from '@/utils/toast';
@@ -38,18 +38,12 @@ export const RegisterScreen = () => {
   const router = useRouter();
   const { t } = useAuthTranslation();
 
-  // const [showPassword, setShowPassword] = useState(false);
-  // const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [showOtpModal, setShowOtpModal] = useState(false);
   const [registeredEmail, setRegisteredEmail] = useState('');
   const [registeredUserId, setRegisteredUserId] = useState('');
 
-  const {
-    control,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<RegisterFormData>({
+  const form = useForm<RegisterFormData>({
     resolver: zodResolver(createRegisterSchema(t)),
     defaultValues: {
       name: '',
@@ -57,6 +51,7 @@ export const RegisterScreen = () => {
       password: '',
       confirmPassword: '',
     },
+    mode: 'onTouched',
   });
 
   // Determine registration type based on emailOrPhone input
@@ -167,167 +162,64 @@ export const RegisterScreen = () => {
             </View>
 
             {/* Register Form */}
-            <View className='space-y-4'>
-              {/* Full Name */}
-              <View>
-                <Text className='mb-2 text-sm font-medium text-orange-800'>
-                  {t('form.firstName')} *
-                </Text>
-                <Controller
-                  control={control}
+            <FormProvider {...form}>
+              <View className='gap-4'>
+                {/* Full Name */}
+                <InputText
                   name='name'
-                  render={({ field: { onChange, onBlur, value } }) => (
-                    <Input
-                      value={value}
-                      onChangeText={onChange}
-                      onBlur={onBlur}
-                      placeholder={t('form.firstName')}
-                      autoCapitalize='words'
-                      editable={!isLoading}
-                      className='border-orange-200 bg-white focus:border-orange-400'
-                    />
-                  )}
+                  label={t('form.fullName')}
+                  placeholder={t('form.fullName')}
+                  required
+                  disabled={isLoading}
+                  autoCapitalize='words'
                 />
-                {errors.name && (
-                  <Text className='mt-1 text-xs text-red-600'>
-                    {errors.name.message}
-                  </Text>
-                )}
-              </View>
 
-              {/* Email or Phone (Combined Field) */}
-              <View>
-                <Text className='mb-2 text-sm font-medium text-orange-800'>
-                  {t('form.emailOrPhone')} *
-                </Text>
-                <Controller
-                  control={control}
+                {/* Email or Phone */}
+                <InputText
                   name='emailOrPhone'
-                  render={({ field: { onChange, onBlur, value } }) => (
-                    <Input
-                      value={value}
-                      onChangeText={onChange}
-                      onBlur={onBlur}
-                      placeholder={t('form.emailOrPhonePlaceholder')}
-                      keyboardType='default'
-                      autoCapitalize='none'
-                      autoComplete='username'
-                      editable={!isLoading}
-                      className='border-orange-200 bg-white focus:border-orange-400'
-                    />
-                  )}
+                  label={t('form.emailOrPhone')}
+                  placeholder={t('form.emailOrPhonePlaceholder')}
+                  helperText={t('validation.phoneOrEmailHint')}
+                  required
+                  disabled={isLoading}
+                  keyboardType='default'
+                  autoCapitalize='none'
+                  autoComplete='username'
                 />
-                {errors.emailOrPhone && (
-                  <Text className='mt-1 text-xs text-red-600'>
-                    {errors.emailOrPhone.message}
-                  </Text>
-                )}
-                {!errors.emailOrPhone && (
-                  <Text className='mt-1 text-xs text-orange-600'>
-                    {t('validation.phoneOrEmailHint')}
-                  </Text>
-                )}
-              </View>
 
-              {/* Password */}
-              <View>
-                <Text className='mb-2 text-sm font-medium text-orange-800'>
-                  {t('form.password')} *
-                </Text>
-                <View className='relative'>
-                  <Controller
-                    control={control}
-                    name='password'
-                    render={({ field: { onChange, onBlur, value } }) => (
-                      <Input
-                        isPassword
-                        value={value}
-                        onChangeText={onChange}
-                        onBlur={onBlur}
-                        placeholder={t('form.password')}
-                        // secureTextEntry={!showPassword}
-                        editable={!isLoading}
-                        className='border-orange-200 bg-white pr-12 focus:border-orange-400'
-                      />
-                    )}
-                  />
-                  {/* <TouchableOpacity
-                    onPress={() => setShowPassword(!showPassword)}
-                    disabled={isLoading}
-                    className='absolute right-3 top-1/2 -translate-y-1/2'
-                  >
-                    <Text className='text-sm font-medium text-orange-600'>
-                      {showPassword ? t('hide') : t('show')}
-                    </Text>
-                  </TouchableOpacity> */}
-                </View>
-                {errors.password && (
-                  <Text className='mt-1 text-xs text-red-600'>
-                    {errors.password.message}
-                  </Text>
-                )}
-              </View>
-
-              {/* Confirm Password */}
-              <View>
-                <Text className='mb-2 text-sm font-medium text-orange-800'>
-                  {t('form.confirmPassword')} *
-                </Text>
-                <View className='relative'>
-                  <Controller
-                    control={control}
-                    name='confirmPassword'
-                    render={({ field: { onChange, onBlur, value } }) => (
-                      <Input
-                        isPassword
-                        value={value}
-                        onChangeText={onChange}
-                        onBlur={onBlur}
-                        placeholder={t('form.confirmPassword')}
-                        // secureTextEntry={!showConfirmPassword}
-                        editable={!isLoading}
-                        className='border-orange-200 bg-white pr-12 focus:border-orange-400'
-                      />
-                    )}
-                  />
-                  {/* <TouchableOpacity
-                    onPress={() => setShowConfirmPassword(!showConfirmPassword)}
-                    disabled={isLoading}
-                    className='absolute right-3 top-1/2 -translate-y-1/2'
-                  >
-                    <Text className='text-sm font-medium text-orange-600'>
-                      {showConfirmPassword ? t('hide') : t('show')}
-                    </Text>
-                  </TouchableOpacity> */}
-                </View>
-                {errors.confirmPassword && (
-                  <Text className='mt-1 text-xs text-red-600'>
-                    {errors.confirmPassword.message}
-                  </Text>
-                )}
-              </View>
-
-              {/* Register Button */}
-              <View style={{ marginTop: 24 }}>
-                {/* {isLoading && (
-                  <View className='mb-2 flex-row items-center justify-center'>
-                    <ActivityIndicator size='small' color='#f97316' />
-                    <Text className='ml-2 text-sm text-orange-600'>
-                      {t('signingIn')}
-                    </Text>
-                  </View>
-                )} */}
-                <Button
-                  title={isLoading ? t('signingIn') : t('createAccount')}
-                  onPress={handleSubmit(onSubmit)}
-                  variant='primary'
-                  fullWidth
-                  // disabled={isLoading}
-                  loading={isLoading}
-                  style={{ backgroundColor: '#f97316' }}
+                {/* Password */}
+                <InputText
+                  name='password'
+                  label={t('form.password')}
+                  placeholder={t('form.password')}
+                  required
+                  disabled={isLoading}
+                  isPassword
                 />
+
+                {/* Confirm Password */}
+                <InputText
+                  name='confirmPassword'
+                  label={t('form.confirmPassword')}
+                  placeholder={t('form.confirmPassword')}
+                  required
+                  disabled={isLoading}
+                  isPassword
+                />
+
+                {/* Register Button */}
+                <View style={{ marginTop: 8 }}>
+                  <Button
+                    title={isLoading ? t('signingIn') : t('createAccount')}
+                    onPress={form.handleSubmit(onSubmit)}
+                    variant='primary'
+                    fullWidth
+                    loading={isLoading}
+                    style={{ backgroundColor: '#f97316' }}
+                  />
+                </View>
               </View>
-            </View>
+            </FormProvider>
 
             {/* Login Link */}
             <View className='mt-6 flex-row items-center justify-center'>
