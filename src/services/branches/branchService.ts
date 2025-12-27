@@ -3,7 +3,6 @@ import type { Branch, BranchDetail } from '@ahomevilla-hotel/node-sdk';
 import { ENDPOINTS, publicRequest } from '@/config/api';
 import type { BranchFilters } from '@/types/filters';
 import type { PaginationResult } from '@/types/pagination';
-import { handleServiceError } from '@/utils/errors';
 
 import type { IBranchService } from './IBranchService';
 
@@ -16,14 +15,10 @@ export class BranchService implements IBranchService {
    * Get latest branches
    */
   async getLatestBranches(): Promise<Branch[]> {
-    try {
-      const response = await publicRequest.get<Branch[]>(
-        ENDPOINTS.GET_LATEST_BRANCHES
-      );
-      return response.data;
-    } catch (error) {
-      throw handleServiceError(error, 'Failed to fetch latest branches');
-    }
+    const response = await publicRequest.get<Branch[]>(
+      ENDPOINTS.GET_LATEST_BRANCHES
+    );
+    return response.data;
   }
 
   /**
@@ -34,43 +29,35 @@ export class BranchService implements IBranchService {
     pageSize: number = 10,
     filters?: BranchFilters
   ): Promise<PaginationResult<Branch>> {
-    try {
-      const params: {
-        page: number;
-        pageSize: number;
-        filters?: string;
-      } = {
-        page,
-        pageSize,
-      };
+    const params: {
+      page: number;
+      pageSize: number;
+      filters?: string;
+    } = {
+      page,
+      pageSize,
+    };
 
-      // Stringify filters if provided (backend expects JSON string)
-      if (filters && Object.keys(filters).length > 0) {
-        params.filters = JSON.stringify(filters);
-      }
-
-      const response = await publicRequest.get<PaginationResult<Branch>>(
-        ENDPOINTS.BRANCHES,
-        { params }
-      );
-      return response.data;
-    } catch (error) {
-      throw handleServiceError(error, 'Failed to fetch branches');
+    // Stringify filters if provided (backend expects JSON string)
+    if (filters && Object.keys(filters).length > 0) {
+      params.filters = JSON.stringify(filters);
     }
+
+    const response = await publicRequest.get<PaginationResult<Branch>>(
+      ENDPOINTS.BRANCHES,
+      { params }
+    );
+    return response.data;
   }
 
   /**
    * Get branch details by ID or slug
    */
   async getBranchDetail(idOrSlug: string): Promise<BranchDetail> {
-    try {
-      const response = await publicRequest.get<BranchDetail>(
-        `${ENDPOINTS.BRANCHES}/${idOrSlug}`
-      );
-      return response.data;
-    } catch (error) {
-      throw handleServiceError(error, 'Failed to fetch branch details');
-    }
+    const response = await publicRequest.get<BranchDetail>(
+      `${ENDPOINTS.BRANCHES}/${idOrSlug}`
+    );
+    return response.data;
   }
 }
 

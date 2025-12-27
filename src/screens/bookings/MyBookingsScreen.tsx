@@ -103,7 +103,7 @@ export const MyBookingsScreen = () => {
     try {
       setIsLoading(true);
       const data = await bookingService.getMyBookings();
-      console.log('Processing bookings:', data);
+      // console.log('Processing bookings:', data);
       setBookings(data);
       setError(null);
     } catch (err) {
@@ -335,10 +335,6 @@ export const MyBookingsScreen = () => {
           style={styles.roomImage}
           contentFit='cover'
           transition={300}
-          onError={e => {
-            console.log('Image load error');
-            console.log('Failed image URL:', imageUrl);
-          }}
         />
 
         {/* Status Badge */}
