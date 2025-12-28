@@ -11,10 +11,11 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+
 import { Button, Input } from '@/components/ui';
 import { useAuthTranslation } from '@/i18n/hooks';
 import { authService } from '@/services/auth/authService';
-import { showSuccessToast } from '@/utils/toast';
+import { showErrorToast, showSuccessToast } from '@/utils/toast';
 import {
   createForgotPasswordEmailSchema,
   type ForgotPasswordEmailFormData,
@@ -35,12 +36,15 @@ export const ForgotPasswordScreen = () => {
     console.log('[Màn hình Quên mật khẩu] Đã khởi tạo');
   }, []);
 
-  const form = useForm<ForgotPasswordEmailFormData>({
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<ForgotPasswordEmailFormData>({
     resolver: zodResolver(createForgotPasswordEmailSchema(t)),
     defaultValues: {
       email: '',
     },
-    mode: 'onTouched',
   });
 
   const onSubmit = async (data: ForgotPasswordEmailFormData) => {
@@ -133,6 +137,7 @@ export const ForgotPasswordScreen = () => {
                 </Text>
               )}
             </View>
+
             {/* Submit Button */}
             <View style={{ marginTop: 24 }}>
               <Button
