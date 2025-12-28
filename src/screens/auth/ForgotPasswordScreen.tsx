@@ -21,20 +21,11 @@ import {
   type ForgotPasswordEmailFormData,
 } from '@/utils/validation';
 
-/**
- * Forgot Password Screen - Step 1 of Flow
- * User enters email, OTP is sent, then navigates to verify-otp screen
- */
 export const ForgotPasswordScreen = () => {
   const router = useRouter();
   const { t } = useAuthTranslation();
-
   const [isLoading, setIsLoading] = useState(false);
-
-  // Log component mount
-  useEffect(() => {
-    console.log('[Màn hình Quên mật khẩu] Đã khởi tạo');
-  }, []);
+  useEffect(() => {}, []);
 
   const {
     control,
@@ -49,24 +40,17 @@ export const ForgotPasswordScreen = () => {
 
   const onSubmit = async (data: ForgotPasswordEmailFormData) => {
     const email = data.email.trim();
-    console.log('[Màn hình Quên mật khẩu] Đang gửi email:', email);
     setIsLoading(true);
 
     try {
       const response = await authService.initiateForgotPassword({ email });
       console.log('[Màn hình Quên mật khẩu] Gửi OTP thành công:', response);
-
-      // Show success message
       showSuccessToast(t('success.otpSent') || 'Reset code sent to your email');
-
-      // Navigate to verify OTP screen with email param
-      console.log('[Màn hình Quên mật khẩu] Chuyển đến màn xác thực OTP');
       router.push({
         pathname: '/auth/verify-otp' as any,
         params: { email },
       });
     } catch (error) {
-      console.error('[Màn hình Quên mật khẩu] Lỗi:', error);
       const errorMessage =
         error instanceof Error ? error.message : t('errors.generic');
       showErrorToast(errorMessage);
@@ -86,7 +70,6 @@ export const ForgotPasswordScreen = () => {
         keyboardShouldPersistTaps='handled'
       >
         <View className='flex-1 justify-center px-6 py-12'>
-          {/* Logo Section */}
           <View className='mb-8 items-center'>
             <Image
               source={require('@/assets/logos/logo-dark.webp')}
@@ -101,10 +84,7 @@ export const ForgotPasswordScreen = () => {
                 'Enter your email to receive a reset code'}
             </Text>
           </View>
-
-          {/* Form */}
           <View className='space-y-4'>
-            {/* Email Input */}
             <View>
               <Text className='mb-2 text-sm font-medium text-orange-800'>
                 {t('form.emailOrPhone') || 'Email'} *
@@ -137,8 +117,6 @@ export const ForgotPasswordScreen = () => {
                 </Text>
               )}
             </View>
-
-            {/* Submit Button */}
             <View style={{ marginTop: 24 }}>
               <Button
                 title={
@@ -155,8 +133,6 @@ export const ForgotPasswordScreen = () => {
               />
             </View>
           </View>
-
-          {/* Back to Login Link */}
           <View className='mt-6 items-center'>
             <TouchableOpacity
               onPress={() => router.back()}

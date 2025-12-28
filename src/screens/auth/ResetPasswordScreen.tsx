@@ -32,10 +32,6 @@ const resetPasswordSchema = z
 
 type ResetPasswordFormData = z.infer<typeof resetPasswordSchema>;
 
-/**
- * Reset Password Screen - Step 3 of Forgot Password Flow
- * Receives email and OTP from previous screen, resets password
- */
 export const ResetPasswordScreen = () => {
   const router = useRouter();
   const { t } = useAuthTranslation();
@@ -46,15 +42,6 @@ export const ResetPasswordScreen = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-
-  // Log component mount
-  useEffect(() => {
-    console.log('[Màn hình Đặt lại mật khẩu] Đã khởi tạo với:', {
-      email,
-      otp: otp.substring(0, 2) + '****',
-    });
-  }, [email, otp]);
-
   const {
     control,
     handleSubmit,
@@ -68,27 +55,16 @@ export const ResetPasswordScreen = () => {
   });
 
   const onSubmit = async (data: ResetPasswordFormData) => {
-    console.log('[Màn hình Đặt lại mật khẩu] Đang đặt lại mật khẩu cho:', {
-      email,
-    });
     setIsSubmitting(true);
-
     try {
       const result = await authService.resetPasswordWithOTP({
         email,
         code: otp,
         newPassword: data.newPassword,
       });
-      console.log(
-        '[Màn hình Đặt lại mật khẩu] Đặt lại mật khẩu thành công:',
-        result
-      );
-
       showSuccessToast(
         t('otp.passwordResetSuccess') || 'Password reset successfully!'
       );
-
-      // Navigate to login
       router.replace('/auth/login');
     } catch (error) {
       console.error('[Màn hình Đặt lại mật khẩu] Lỗi:', error);
@@ -110,7 +86,6 @@ export const ResetPasswordScreen = () => {
         keyboardShouldPersistTaps='handled'
       >
         <View className='flex-1 justify-center px-6 py-12'>
-          {/* Header */}
           <View className='mb-8 items-center'>
             <Image
               source={require('@/assets/logos/logo-dark.webp')}
@@ -124,10 +99,7 @@ export const ResetPasswordScreen = () => {
               {t('otp.enterNewPassword') || 'Enter your new password'}
             </Text>
           </View>
-
-          {/* Form */}
           <View className='space-y-4'>
-            {/* New Password */}
             <View>
               <Text className='mb-2 text-sm font-medium text-orange-800'>
                 {t('otp.newPassword') || 'New Password'} *
@@ -140,9 +112,6 @@ export const ResetPasswordScreen = () => {
                     <Input
                       value={value}
                       onChangeText={text => {
-                        console.log(
-                          '[Màn hình Đặt lại mật khẩu] Mật khẩu mới đã thay đổi'
-                        );
                         onChange(text);
                       }}
                       onBlur={onBlur}
@@ -171,8 +140,6 @@ export const ResetPasswordScreen = () => {
                 </Text>
               )}
             </View>
-
-            {/* Confirm Password */}
             <View>
               <Text className='mb-2 text-sm font-medium text-orange-800'>
                 {t('form.confirmPassword') || 'Confirm Password'} *
@@ -185,9 +152,6 @@ export const ResetPasswordScreen = () => {
                     <Input
                       value={value}
                       onChangeText={text => {
-                        console.log(
-                          '[Màn hình Đặt lại mật khẩu] Xác nhận mật khẩu đã thay đổi'
-                        );
                         onChange(text);
                       }}
                       onBlur={onBlur}
@@ -219,8 +183,6 @@ export const ResetPasswordScreen = () => {
                 </Text>
               )}
             </View>
-
-            {/* Submit Button */}
             <View style={{ marginTop: 24 }}>
               <Button
                 title={
@@ -237,8 +199,6 @@ export const ResetPasswordScreen = () => {
               />
             </View>
           </View>
-
-          {/* Back Link */}
           <View className='mt-6 items-center'>
             <TouchableOpacity
               onPress={() => router.back()}

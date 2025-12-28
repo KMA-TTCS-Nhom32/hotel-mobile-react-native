@@ -30,10 +30,6 @@ import {
   type RegisterFormData,
 } from '@/utils/validation';
 
-/**
- * Register screen with react-hook-form and Zod validation
- * Supports both email and phone registration
- */
 export const RegisterScreen = () => {
   const router = useRouter();
   const { t } = useAuthTranslation();
@@ -54,19 +50,15 @@ export const RegisterScreen = () => {
     mode: 'onTouched',
   });
 
-  // Determine registration type based on emailOrPhone input
   const getRegistrationType = (
     emailOrPhone: string
   ): { type: RegisterDtoAccountIdentifierEnum; value: string } | null => {
     const trimmedValue = emailOrPhone.trim();
-
-    // If contains '@', treat as email
     if (trimmedValue.includes('@')) {
       if (isValidEmail(trimmedValue)) {
         return { type: AccountIdentifier.Email, value: trimmedValue };
       }
     } else {
-      // Otherwise treat as phone
       if (isValidPhone(trimmedValue)) {
         return { type: AccountIdentifier.Phone, value: trimmedValue };
       }
@@ -82,7 +74,6 @@ export const RegisterScreen = () => {
       showErrorToast(t('validation.phoneOrEmail'));
       return;
     }
-
     setIsLoading(true);
 
     try {
@@ -101,22 +92,15 @@ export const RegisterScreen = () => {
       };
 
       const response = await authService.register(payload);
-
-      // Show success message
       showSuccessToast(t('success.registerSuccess'));
-
-      // For email registration, show OTP modal for verification
       if (identifierData.type === AccountIdentifier.Email) {
         setRegisteredEmail(identifierData.value);
         setRegisteredUserId(response.id);
         setShowOtpModal(true);
       } else {
-        // For phone registration (not implemented yet), redirect to login
         router.replace('/auth/login');
       }
     } catch (error) {
-      // Error toast is shown automatically by API interceptor
-      console.error('Registration error:', error);
     } finally {
       setIsLoading(false);
     }
@@ -124,13 +108,11 @@ export const RegisterScreen = () => {
 
   const handleOtpSuccess = () => {
     setShowOtpModal(false);
-    // Navigate to login screen after successful email verification
     router.replace('/auth/login');
   };
 
   const handleOtpClose = () => {
     setShowOtpModal(false);
-    // Still redirect to login - user can verify later
     router.replace('/auth/login');
   };
 
@@ -146,7 +128,6 @@ export const RegisterScreen = () => {
           keyboardShouldPersistTaps='handled'
         >
           <View className='flex-1 justify-center px-6 py-12'>
-            {/* Logo Section */}
             <View className='mb-8 items-center'>
               <Image
                 source={require('@/assets/logos/logo-dark.webp')}
@@ -160,11 +141,8 @@ export const RegisterScreen = () => {
                 {t('welcomeSubtitle')}
               </Text>
             </View>
-
-            {/* Register Form */}
             <FormProvider {...form}>
               <View className='gap-4'>
-                {/* Full Name */}
                 <InputText
                   name='name'
                   label={t('form.fullName')}
@@ -173,8 +151,6 @@ export const RegisterScreen = () => {
                   disabled={isLoading}
                   autoCapitalize='words'
                 />
-
-                {/* Email or Phone */}
                 <InputText
                   name='emailOrPhone'
                   label={t('form.emailOrPhone')}
@@ -186,8 +162,6 @@ export const RegisterScreen = () => {
                   autoCapitalize='none'
                   autoComplete='username'
                 />
-
-                {/* Password */}
                 <InputText
                   name='password'
                   label={t('form.password')}
@@ -196,8 +170,6 @@ export const RegisterScreen = () => {
                   disabled={isLoading}
                   isPassword
                 />
-
-                {/* Confirm Password */}
                 <InputText
                   name='confirmPassword'
                   label={t('form.confirmPassword')}
@@ -206,8 +178,6 @@ export const RegisterScreen = () => {
                   disabled={isLoading}
                   isPassword
                 />
-
-                {/* Register Button */}
                 <View style={{ marginTop: 8 }}>
                   <Button
                     title={isLoading ? t('signingIn') : t('createAccount')}
@@ -220,8 +190,6 @@ export const RegisterScreen = () => {
                 </View>
               </View>
             </FormProvider>
-
-            {/* Login Link */}
             <View className='mt-6 flex-row items-center justify-center'>
               <Text className='text-sm text-orange-700'>
                 {t('alreadyHaveAccount')}{' '}
@@ -237,8 +205,6 @@ export const RegisterScreen = () => {
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
-
-      {/* OTP Modal for Email Verification */}
       <OTPInputModal
         visible={showOtpModal}
         mode='register'
