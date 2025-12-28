@@ -171,29 +171,26 @@ export const OTPInputModal: React.FC<OTPInputModalProps> = ({
   // Handle form submission
   const handleSubmit = async () => {
     setIsSubmitting(true);
-
+    const otpValue = otpDigits.join('');
     try {
       if (mode === 'register') {
-        // Verify email with OTP - requires userId from registration
         if (!userId) {
           throw new Error('User ID is required for email verification');
         }
-        const otpValue = otpDigits.join('');
         const payload: VerifyEmailDto = {
           userId,
           code: otpValue,
         };
-        await authService.verifyEmail(payload);
+        const result = await authService.verifyEmail(payload);
         showSuccessToast(t('success.otpVerified'));
       } else {
-        // Reset password with OTP
         const formData = forgotPasswordForm.getValues();
         const payload: ResetPasswordWithOTPEmailDto = {
           email,
           code: formData.otp,
           newPassword: formData.newPassword,
         };
-        await authService.resetPasswordWithOTP(payload);
+        const result = await authService.resetPasswordWithOTP(payload);
         showSuccessToast(
           t('otp.passwordResetSuccess') || 'Password reset successfully!'
         );
@@ -208,8 +205,6 @@ export const OTPInputModal: React.FC<OTPInputModalProps> = ({
       setIsSubmitting(false);
     }
   };
-
-  // Validate OTP before submission
   const isOtpComplete = otpDigits.every(d => d !== '');
   const canSubmit =
     mode === 'register'
@@ -231,7 +226,6 @@ export const OTPInputModal: React.FC<OTPInputModalProps> = ({
           contentContainerStyle={{ flexGrow: 1 }}
           keyboardShouldPersistTaps='handled'
         >
-          {/* Header */}
           <View className='flex-row items-center justify-between border-b border-neutral-200 px-4 py-4'>
             <TouchableOpacity onPress={onClose} disabled={isSubmitting}>
               <Text className='text-base text-orange-600'>
@@ -246,17 +240,13 @@ export const OTPInputModal: React.FC<OTPInputModalProps> = ({
             <View style={{ width: 60 }} />
           </View>
 
-          {/* Content */}
           <View className='flex-1 px-6 py-8'>
-            {/* Subtitle */}
             <Text className='mb-2 text-center text-base text-neutral-600'>
               {t('otp.subtitle') || 'Enter the 6-digit code sent to'}
             </Text>
             <Text className='mb-8 text-center text-base font-semibold text-orange-600'>
               {email}
             </Text>
-
-            {/* OTP Input Grid */}
             <View className='mb-6 flex-row justify-center gap-2'>
               {otpDigits.map((digit, index) => (
                 <TextInput
@@ -277,8 +267,6 @@ export const OTPInputModal: React.FC<OTPInputModalProps> = ({
                 />
               ))}
             </View>
-
-            {/* Resend Timer / Button (only for forgot-password) */}
             {mode === 'forgot-password' && (
               <View className='mb-6 items-center'>
                 {resendCooldown > 0 ? (
@@ -304,11 +292,8 @@ export const OTPInputModal: React.FC<OTPInputModalProps> = ({
                 )}
               </View>
             )}
-
-            {/* Password Fields (only for forgot-password mode) */}
             {mode === 'forgot-password' && (
               <View className='space-y-4'>
-                {/* New Password */}
                 <View>
                   <Text className='mb-2 text-sm font-medium text-orange-800'>
                     {t('otp.newPassword') || 'New Password'} *
@@ -346,7 +331,6 @@ export const OTPInputModal: React.FC<OTPInputModalProps> = ({
                   )}
                 </View>
 
-                {/* Confirm Password */}
                 <View>
                   <Text className='mb-2 text-sm font-medium text-orange-800'>
                     {t('form.confirmPassword') || 'Confirm Password'} *
@@ -393,8 +377,6 @@ export const OTPInputModal: React.FC<OTPInputModalProps> = ({
               </View>
             )}
           </View>
-
-          {/* Submit Button */}
           <View className='px-6 pb-8'>
             <Button
               title={

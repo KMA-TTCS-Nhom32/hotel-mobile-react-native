@@ -22,29 +22,17 @@ import {
 
 import type { IAuthService } from './IAuthService';
 
-/**
- * Authentication service implementation
- * Errors are automatically transformed to AppError by axios interceptors
- */
 export class AuthService implements IAuthService {
-  /**
-   * Login with email/phone and password
-   */
   login = async (credentials: LoginDto): Promise<LoginResponseDto> => {
     const response = await publicRequest.post<LoginResponseDto>(
       ENDPOINTS.LOGIN,
       credentials
     );
-
-    // Store tokens using TokenManager
     await TokenManager.setTokens(response.data);
 
     return response.data;
   };
 
-  /**
-   * Register a new user
-   */
   register = async (payload: RegisterDto): Promise<RegisterResponseDto> => {
     const response = await publicRequest.post<RegisterResponseDto>(
       ENDPOINTS.REGISTER,
@@ -53,9 +41,6 @@ export class AuthService implements IAuthService {
     return response.data;
   };
 
-  /**
-   * Refresh access token using refresh token
-   */
   refreshToken = async (): Promise<RefreshTokenResponseDto> => {
     const refreshToken = await TokenManager.getRefreshToken();
 
@@ -68,37 +53,26 @@ export class AuthService implements IAuthService {
       { refreshToken }
     );
 
-    // Store new tokens
     await TokenManager.setTokens(response.data);
 
     return response.data;
   };
 
-  /**
-   * Logout user and clear session
-   */
   logout = async (): Promise<void> => {
     try {
       await privateRequest.post(ENDPOINTS.LOGOUT);
     } catch (error) {
-      // Continue with local cleanup even if API call fails
       console.warn('Logout API call failed:', error);
     } finally {
       await this.clearSession();
     }
   };
 
-  /**
-   * Get user profile information
-   */
   getProfile = async (): Promise<User> => {
     const response = await privateRequest.get<User>(ENDPOINTS.PROFILE);
     return response.data;
   };
 
-  /**
-   * Check if user is currently authenticated
-   */
   isAuthenticated = async (): Promise<boolean> => {
     try {
       const accessToken = await TokenManager.getAccessToken();
@@ -111,16 +85,10 @@ export class AuthService implements IAuthService {
     }
   };
 
-  /**
-   * Clear local session data
-   */
   clearSession = async (): Promise<void> => {
     await TokenManager.clearTokens();
   };
 
-  /**
-   * Update user profile
-   */
   updateProfile = async (payload: UpdateProfileDto): Promise<User> => {
     const response = await privateRequest.patch<User>(
       ENDPOINTS.PROFILE,
@@ -128,10 +96,6 @@ export class AuthService implements IAuthService {
     );
     return response.data;
   };
-
-  /**
-   * Change current user's password
-   */
   changePassword = async (
     payload: ChangePasswordDto
   ): Promise<ResponseWithMessage> => {
@@ -142,22 +106,20 @@ export class AuthService implements IAuthService {
     return response.data;
   };
 
-  /**
-   * Verify email with OTP code (after registration)
-   */
   verifyEmail = async (
     payload: VerifyEmailDto
   ): Promise<ResponseWithMessage> => {
-    const response = await publicRequest.post<ResponseWithMessage>(
-      ENDPOINTS.VERIFY_EMAIL,
-      payload
-    );
-    return response.data;
+    try {
+      const response = await publicRequest.post<ResponseWithMessage>(
+        ENDPOINTS.VERIFY_EMAIL,
+        payload
+      );
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
   };
 
-  /**
-   * Initiate forgot password - sends OTP to email
-   */
   initiateForgotPassword = async (
     payload: InitiateForgotPasswordEmailDto
   ): Promise<ResponseWithMessage> => {
@@ -168,9 +130,18 @@ export class AuthService implements IAuthService {
     return response.data;
   };
 
-  /**
-   * Reset password using OTP
-   */
+  verifyForgotPasswordOTP = async (
+    email: string,
+    code: string
+  ): Promise<{ success: boolean; message: string; userId: string }> => {
+    const response = await publicRequest.post<{
+      success: boolean;
+      message: string;
+      userId: string;
+    }>(ENDPOINTS.VERIFY_FORGOT_PASSWORD_OTP, { email, code });
+    return response.data;
+  };
+
   resetPasswordWithOTP = async (
     payload: ResetPasswordWithOTPEmailDto
   ): Promise<ResponseWithMessage> => {
@@ -181,6 +152,4 @@ export class AuthService implements IAuthService {
     return response.data;
   };
 }
-
-// Export singleton instance
 export const authService = new AuthService();
