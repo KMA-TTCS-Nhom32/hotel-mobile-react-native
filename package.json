@@ -30,7 +30,7 @@
     "up-sdk": "pnpm up @ahomevilla-hotel/node-sdk@latest"
   },
   "dependencies": {
-    "@ahomevilla-hotel/node-sdk": "2025.12.2-3.103119",
+    "@ahomevilla-hotel/node-sdk": "2025.12.2-5.162723",
     "@expo/vector-icons": "^15.0.3",
     "@gorhom/bottom-sheet": "^5.2.6",
     "@hookform/resolvers": "^5.2.1",
@@ -48,7 +48,6 @@
     "expo-blur": "~15.0.8",
     "expo-clipboard": "^8.0.8",
     "expo-constants": "~18.0.12",
-    "expo-dev-client": "~6.0.20",
     "expo-font": "~14.0.10",
     "expo-haptics": "~15.0.8",
     "expo-image": "~3.0.11",

@@ -17,7 +17,7 @@ import { Pressable, ScrollView, Text, View } from 'react-native';
 import { InputTextarea } from '@/components/forms';
 import { Screen } from '@/components/layout';
 import {
-  GuestCounter,
+  // GuestCounter,
   PaymentMethodSelector,
   PromotionSection,
   RoomBookingSummary,
@@ -29,7 +29,7 @@ import { useCreatePaymentLink } from '@/hooks/useCreatePaymentLink';
 import { useRoomDetail } from '@/hooks/useRoomDetail';
 import { usePaymentTranslation } from '@/i18n/hooks';
 import { useBookingStore } from '@/store/bookingStore';
-import type { GuestCount } from '@/types/payment';
+// import type { GuestCount } from '@/types/payment';
 import { formatCurrency, formatDateForAPI } from '@/utils/format';
 import { showErrorToast } from '@/utils/toast';
 
@@ -96,11 +96,11 @@ export default function PaymentScreen() {
   const room = selectedRoom || fetchedRoom;
 
   // Initialize guests from filters
-  const [guests, setGuests] = React.useState<GuestCount>({
-    adults: filters.adults,
-    children: filters.children,
-    infants: filters.infants,
-  });
+  // const [guests, setGuests] = React.useState<GuestCount>({
+  //   adults: filters.adults,
+  //   children: filters.children,
+  //   infants: filters.infants,
+  // });
 
   const [selectedPaymentMethod, setSelectedPaymentMethod] =
     React.useState<CreateBookingOnlineDtoPaymentMethodEnum>(
@@ -135,13 +135,6 @@ export default function PaymentScreen() {
   // Format dates for API
   const startDateFormatted = formatDateForAPI(filters.startDate);
   const endDateFormatted = formatDateForAPI(filters.endDate);
-
-  // Format dates for display
-  const formatDisplayDate = (date: Date) => {
-    const day = String(date.getDate()).padStart(2, '0');
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    return `${day}/${month}`;
-  };
 
   // Booking creation mutation
   const { mutate: createBooking, isPending: isCreatingBooking } =
@@ -234,15 +227,18 @@ export default function PaymentScreen() {
       end_date: endDateFormatted,
       start_time: filters.startTime,
       end_time: filters.endTime,
-      number_of_guests: guests.adults,
-      adults: guests.adults,
-      children: guests.children,
-      infants: guests.infants,
+      adults: filters.adults,
+      children: filters.children,
+      infants: filters.infants,
+      number_of_guests: filters.adults,
+      // adults: guests.adults,
+      // children: guests.children,
+      // infants: guests.infants,
       special_requests: form.getValues('special_requests'),
       payment_method: selectedPaymentMethod,
     };
 
-    console.log('booking payload', bookingData);
+    // console.log('booking payload', bookingData);
     // Create booking via API
     createBooking(bookingData);
   };
@@ -291,26 +287,18 @@ export default function PaymentScreen() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ padding: 16, paddingBottom: 100 }}
       >
-        {/* Room Summary - Use store data */}
-        <RoomBookingSummary
-          room={room}
-          checkInDate={formatDisplayDate(filters.startDate)}
-          checkInTime={filters.startTime}
-          checkOutDate={formatDisplayDate(filters.endDate)}
-          checkOutTime={filters.endTime}
-          bookingType={filters.bookingType as CreateBookingOnlineDtoTypeEnum}
-          price={formatCurrency(basePrice)}
-        />
+        {/* Room Summary - Uses booking store directly */}
+        <RoomBookingSummary />
 
         {/* Guest Counter */}
-        <View className='mt-4'>
+        {/* <View className='mt-4'>
           <GuestCounter
             guests={guests}
             maxAdults={room.max_adults || 2}
-            maxChildren={room.max_children || 1}
+            maxChildren={room.max_children || 0}
             onChange={setGuests}
           />
-        </View>
+        </View> */}
 
         {/* Special Requests */}
         <View className='mt-4'>
